@@ -1,5 +1,5 @@
 {
-    "name": "craffft/css-style-selector-bundle",
+    "name": "pdir/css-style-selector-bundle",
     "type": "contao-bundle",
     "description": "Contao 4 Css Style Selector bundle",
     "keywords": ["css", "selector", "list", "classes"],
