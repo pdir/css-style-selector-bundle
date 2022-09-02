@@ -10,6 +10,6 @@ Types of changes
     Security in case of vulnerabilities.
 )
 
-## [2.0.0](https://github.com/pdir/css-style-selector-bundle/tree/2.0.0) – 2022-08-15
+## [1.7.0](https://github.com/pdir/css-style-selector-bundle/tree/1.7.0) – 2022-09-02
 
 - [Changed] Set Contao 5 as minimum requirement
