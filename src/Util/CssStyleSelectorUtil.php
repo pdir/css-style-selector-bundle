@@ -14,6 +14,7 @@ namespace Craffft\CssStyleSelectorBundle\Util;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Input;
+use Contao\StringUtil;
 use Craffft\CssStyleSelectorBundle\Models\CssStyleSelectorModel;
 
 class CssStyleSelectorUtil
@@ -150,7 +151,7 @@ class CssStyleSelectorUtil
         $arrCssID = Input::post($this->getCssIDName($dc->id, $specialName));
 
         if ($arrCssID === null) {
-            $arrCssID = deserialize($dc->activeRecord->cssID);
+            $arrCssID = StringUtil::deserialize($dc->activeRecord->cssID);
         }
 
         if (!is_array($arrCssID)) {
@@ -196,9 +197,9 @@ class CssStyleSelectorUtil
      */
     protected function convertSerializedCssStyleSelectorToArray($strValue)
     {
-        $arrIds = deserialize($strValue);
+        $arrIds = StringUtil::deserialize($strValue);
 
-        if (!is_array($arrIds)) {
+        if (!\is_array($arrIds)) {
             $arrIds = array();
         }
 

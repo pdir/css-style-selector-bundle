@@ -9,6 +9,9 @@
  * file that was distributed with this source code.
  */
 
+use Contao\DataContainer;
+use Contao\DC_Table;
+
 /**
  * Table tl_css_style_selector
  */
@@ -17,7 +20,7 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = array
     // Config
     'config'   => array
     (
-        'dataContainer'               => 'Table',
+        'dataContainer'               => DC_Table::class,
         'enableVersioning'            => true,
         'sql' => array
         (
@@ -83,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_css_style_selector']['delete'],
                 'href'                => 'act=delete',
                 'icon'                => 'delete.gif',
-                'attributes'          => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
+                'attributes'          => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm']?? '') . '\'))return false;Backend.getScrollOffset()"'
             ),
             'show' => array
             (

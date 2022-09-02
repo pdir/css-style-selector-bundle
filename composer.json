@@ -16,11 +16,14 @@
         "source": "https://github.com/Craffft/css-style-selector-bundle"
     },
     "require": {
-        "php": ">=7.1",
-        "contao/core-bundle": "~4.4"
+        "php": ">=7.1 || ^8.0",
+        "contao/core-bundle": "^4.13 || ^5.0"
     },
     "require-dev": {
-        "contao/manager-plugin": "^2.0"
+        "contao/manager-plugin": "^2.0",
+        "contao/easy-coding-standard": "^3.0",
+        "phpunit/phpunit": "^7.1 || ^8.2 || ^8.4 || ^9.5",
+        "symfony/phpunit-bridge": "^4.4 || ^5.1"
     },
     "conflict": {
         "contao/core": "*",
