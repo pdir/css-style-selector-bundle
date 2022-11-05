@@ -10,6 +10,10 @@ Types of changes
     Security in case of vulnerabilities.
 )
 
+## [1.7.1](https://github.com/pdir/css-style-selector-bundle/tree/1.7.1) – 2022-11-05
+
+- [Fixed] array index issue for php8
+
 ## [1.7.0](https://github.com/pdir/css-style-selector-bundle/tree/1.7.0) – 2022-09-02
 
-- [Changed] Set Contao 5 as minimum requirement
+- [Changed] Allow Contao 5
