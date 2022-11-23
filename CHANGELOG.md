@@ -12,7 +12,7 @@ Types of changes
 
 ## [1.7.1](https://github.com/pdir/css-style-selector-bundle/tree/1.7.1) – 2022-11-23
 
-- [Fixed] Error when saving a form field in Contao 5
+- [Fixed] Error when saving a form field in Contao 5 ([#63](https://github.com/contao-themes-net/nature-theme-bundle/issues/63))
 
 ## [1.7.0](https://github.com/pdir/css-style-selector-bundle/tree/1.7.0) – 2022-09-02
 
