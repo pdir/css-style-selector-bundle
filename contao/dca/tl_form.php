@@ -30,7 +30,7 @@ if (isset($GLOBALS['TL_DCA']['tl_form'])) {
         'eval'             => array('chosen' => true, 'multiple' => true, 'tl_class' => 'clr'),
         'save_callback'    => array
         (
-            function ($varValue, \DataContainer $dc) {
+            function ($varValue, $dc) {
                 $cssStyleSelectorUtil = new Craffft\CssStyleSelectorBundle\Util\CssStyleSelectorUtil();
 
                 return $cssStyleSelectorUtil->saveCssIdCallback($varValue, $dc, 'attributes');
