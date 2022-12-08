@@ -11,14 +11,10 @@ Types of changes
 )
 
 
-## [1.7.2](https://github.com/pdir/css-style-selector-bundle/tree/1.7.1) – 2022-12-08
+## [1.7.1](https://github.com/pdir/css-style-selector-bundle/tree/1.7.1) – 2022-12-08
 
 - [Fixed] Error when saving a form field in Contao 5 ([#63](https://github.com/contao-themes-net/nature-theme-bundle/issues/63))
 - [Changed] Sort styles naturally ([🤗 fritzmg](https://github.com/pdir/css-style-selector-bundle/commit/5201a90d01c26a2bfca9cb876f1ddad9580ad3e9))
-
-## [1.7.1](https://github.com/pdir/css-style-selector-bundle/tree/1.7.1) – 2022-11-05
-
-- [Fixed] array index issue for php8
 
 ## [1.7.0](https://github.com/pdir/css-style-selector-bundle/tree/1.7.0) – 2022-09-02
 
