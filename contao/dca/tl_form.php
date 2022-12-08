@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+use Contao\DataContainer;
+
 if (isset($GLOBALS['TL_DCA']['tl_form'])) {
     // Palettes
     foreach ($GLOBALS['TL_DCA']['tl_form']['palettes'] as $k => $v) {
@@ -30,7 +32,7 @@ if (isset($GLOBALS['TL_DCA']['tl_form'])) {
         'eval'             => array('chosen' => true, 'multiple' => true, 'tl_class' => 'clr'),
         'save_callback'    => array
         (
-            function ($varValue, \DataContainer $dc) {
+            function ($varValue, DataContainer $dc) {
                 $cssStyleSelectorUtil = new Craffft\CssStyleSelectorBundle\Util\CssStyleSelectorUtil();
 
                 return $cssStyleSelectorUtil->saveCssIdCallback($varValue, $dc, 'attributes');
