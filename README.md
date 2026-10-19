@@ -1,56 +1,49 @@
-Contao 4 Css Style Selector Bundle
-=======================
+Contao CSS Style Selector Bundle
+================================
 
-This Contao extension is a CSS style selector for content elements in Contao.
+This Contao extension lets you define CSS styles (a name plus one or more CSS
+classes) once in the back end and select them in articles, content elements,
+modules, forms, form fields, page layouts, pages, news and events. The classes
+of the selected styles are written into the CSS class field of the record.
 
 ### CSS styles can be defined here
 
-![css selector navigation](https://raw.githubusercontent.com/Craffft/css-style-selector-bundle/master/docs/css-style-selector-nav.png)
+![css selector navigation](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/master/docs/css-style-selector-nav.png)
 
 ### The predefined styles can be selected here
 
-![css selector navigation](https://raw.githubusercontent.com/Craffft/css-style-selector-bundle/master/docs/css-style-selector-preview.png)
+![css selector navigation](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/master/docs/css-style-selector-preview.png)
+
+
+Requirements
+------------
+
+- PHP 8.1 or higher (Contao 6 requires PHP 8.4)
+- Contao 5.3 or higher, including Contao 6
 
 
 Installation
 ------------
 
-### Step 1: Download the Bundle
-
-Open a command console, enter your project directory and execute the
-following command to download the latest stable version of this bundle:
+Install the bundle via the Contao Manager or Composer and update the database
+afterwards:
 
 ```bash
-$ composer require craffft/css-style-selector-bundle "dev-master"
+composer require pdir/css-style-selector-bundle
+vendor/bin/contao-console contao:migrate
 ```
 
-This command requires you to have Composer installed globally, as explained
-in the [installation chapter](https://getcomposer.org/doc/00-intro.md)
-of the Composer documentation.
 
-### Step 2: Enable the Bundle
+Usage
+-----
 
-Then, enable the bundle by adding it to the list of registered bundles
-in the `app/AppKernel.php` file of your project:
+Go to *Layout → CSS styles* and create your styles.
 
-```php
-<?php
-// app/AppKernel.php
+- **Permissions:** disable a style for whole areas, e.g. "Disable in pages".
+- **Restrictions:** limit a style to certain content element, module or form
+  field types (e.g. only for `text` and `image` elements). If a restriction is
+  active, the style is only offered for the selected types.
 
-// ...
-class AppKernel extends Kernel
-{
-    public function registerBundles()
-    {
-        $bundles = array(
-            // ...
-
-            new Craffft\CssStyleSelectorBundle\CraffftCssStyleSelectorBundle(),
-        );
-
-        // ...
-    }
-
-    // ...
-}
-```
+When a record is saved, the classes of all styles are removed from its CSS
+class field and the classes of the selected styles are added again. Classes
+you entered manually stay untouched, unless they are also used by a style.

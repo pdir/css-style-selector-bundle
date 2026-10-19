@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Craffft\CssStyleSelectorBundle\:
+        resource: ../src/
+        exclude:
+            - ../src/ContaoManager/
+            - ../src/Models/
+            - ../src/CraffftCssStyleSelectorBundle.php

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the CssStyleSelector Bundle.
  *
@@ -9,8 +11,10 @@
  * file that was distributed with this source code.
  */
 
-$GLOBALS['BE_MOD']['design']['cssStyleSelector'] = array
-(
-    'tables' => array('tl_css_style_selector'),
-    'icon'   => 'bundles/craffftcssstyleselector/icon.png'
-);
+use Craffft\CssStyleSelectorBundle\Models\CssStyleSelectorModel;
+
+$GLOBALS['BE_MOD']['design']['cssStyleSelector'] = [
+    'tables' => ['tl_css_style_selector'],
+];
+
+$GLOBALS['TL_MODELS']['tl_css_style_selector'] = CssStyleSelectorModel::class;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the CssStyleSelector Bundle.
  *
@@ -12,4 +14,4 @@
 /**
  * Back end modules
  */
-$GLOBALS['TL_LANG']['MOD']['cssStyleSelector'] = array('CSS Stile', 'Hier können CSS Stile mit vordefinierten CSS-Klassen erstellt werden.');
+$GLOBALS['TL_LANG']['MOD']['cssStyleSelector'] = ['CSS Stile', 'Hier können CSS Stile mit vordefinierten CSS-Klassen erstellt werden.'];

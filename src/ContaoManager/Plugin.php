@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the CssStyleSelector Bundle.
  *
@@ -9,29 +11,29 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Craffft\CssStyleSelectorBundle\ContaoManager;
 
-use Contao\CoreBundle\ContaoCoreBundle;
-use Contao\NewsBundle\ContaoNewsBundle;
 use Contao\CalendarBundle\ContaoCalendarBundle;
+use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
+use Contao\NewsBundle\ContaoNewsBundle;
 use Craffft\CssStyleSelectorBundle\CraffftCssStyleSelectorBundle;
 use MadeYourDay\RockSolidCustomElements\RockSolidCustomElementsBundle;
 
 class Plugin implements BundlePluginInterface
 {
-    public function getBundles(ParserInterface $parser)
+    public function getBundles(ParserInterface $parser): array
     {
         return [
             BundleConfig::create(CraffftCssStyleSelectorBundle::class)
-                ->setLoadAfter([ContaoCoreBundle::class,
-                                ContaoNewsBundle::class,
-                                ContaoCalendarBundle::class,
-                                RockSolidCustomElementsBundle::class])
+                ->setLoadAfter([
+                    ContaoCoreBundle::class,
+                    ContaoNewsBundle::class,
+                    ContaoCalendarBundle::class,
+                    RockSolidCustomElementsBundle::class,
+                ])
                 ->setReplace(['css-style-selector']),
         ];
     }

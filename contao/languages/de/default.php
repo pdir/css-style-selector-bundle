@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the CssStyleSelector Bundle.
  *
@@ -12,4 +14,4 @@
 /**
  * Miscellaneous
  */
-$GLOBALS['TL_LANG']['MSC']['cssStyleSelector'] = array('CSS-Stil Auswahl', 'Hier können Sie die CSS-Stile mit den vordefinierten CSS-Klassen auswählen.');
+$GLOBALS['TL_LANG']['MSC']['cssStyleSelector'] = ['CSS-Stil Auswahl', 'Hier können Sie die CSS-Stile mit den vordefinierten CSS-Klassen auswählen.'];

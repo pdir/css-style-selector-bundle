@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the CssStyleSelector Bundle.
  *
@@ -9,29 +11,12 @@
  * file that was distributed with this source code.
  */
 
-if (isset($GLOBALS['TL_DCA']['tl_article'])) {
-    // Palettes
-    foreach ($GLOBALS['TL_DCA']['tl_article']['palettes'] as $k => $v) {
-        $GLOBALS['TL_DCA']['tl_article']['palettes'][$k] = str_replace(',cssID', ',cssStyleSelector,cssID', $v);
-    }
-
-    // Fields
-    $GLOBALS['TL_DCA']['tl_article']['fields']['cssStyleSelector'] = array
-    (
-        'label'            => &$GLOBALS['TL_LANG']['MSC']['cssStyleSelector'],
-        'exclude'          => true,
-        'inputType'        => 'select',
-        'options_callback' => function () {
-            return \Craffft\CssStyleSelectorBundle\Models\CssStyleSelectorModel::findStyleDesignationByNotDisabledType(
-                \Craffft\CssStyleSelectorBundle\Models\CssStyleSelectorModel::TYPE_ARTICLE
-            );
-        },
-        'search'           => true,
-        'eval'             => array('chosen' => true, 'multiple' => true, 'tl_class' => 'clr'),
-        'save_callback'    => array
-        (
-            array('Craffft\\CssStyleSelectorBundle\\Util\\CssStyleSelectorUtil', 'saveCssIdCallback')
-        ),
-        'sql'              => "blob NULL"
-    );
-}
+// The field is added to the palettes, gets its options and is applied to the
+// CSS class field by Craffft\CssStyleSelectorBundle\EventListener\DataContainer\CssStyleSelectorFieldListener
+$GLOBALS['TL_DCA']['tl_article']['fields']['cssStyleSelector'] = [
+    'label' => &$GLOBALS['TL_LANG']['MSC']['cssStyleSelector'],
+    'exclude' => true,
+    'inputType' => 'select',
+    'eval' => ['chosen' => true, 'multiple' => true, 'tl_class' => 'clr'],
+    'sql' => 'blob NULL',
+];
