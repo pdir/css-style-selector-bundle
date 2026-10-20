@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = [
     // Palettes
     'palettes' => [
         '__selector__' => ['limitContentElements', 'limitModules', 'limitFormFields'],
-        'default' => '{style_legend},styleDesignation;{css_legend},cssClasses;{permissions_legend},disableInArticle,disableInContent,disableInCalendarEvent,disableInForm,disableInFormField,disableInLayout,disableInModule,disableInNews,disableInPage;{restriction_legend},limitContentElements,limitModules,limitFormFields',
+        'default' => '{style_legend},styleDesignation,description;{css_legend},cssClasses;{permissions_legend},disableInArticle,disableInContent,disableInCalendarEvent,disableInForm,disableInFormField,disableInLayout,disableInModule,disableInNews,disableInPage;{restriction_legend},limitContentElements,limitModules,limitFormFields',
     ],
 
     // Subpalettes
@@ -69,6 +69,13 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = [
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
+        ],
+        'description' => [
+            'exclude' => true,
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => ['maxlength' => 128, 'tl_class' => 'w50'],
+            'sql' => ['type' => 'string', 'length' => 128, 'default' => ''],
         ],
         'cssClasses' => [
             'exclude' => true,

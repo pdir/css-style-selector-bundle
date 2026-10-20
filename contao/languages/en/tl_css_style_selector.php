@@ -23,6 +23,7 @@ $GLOBALS['TL_LANG']['tl_css_style_selector']['restriction_legend'] = 'Restrictio
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_css_style_selector']['styleDesignation'] = ['Style name', 'Please provide a name for this style.'];
+$GLOBALS['TL_LANG']['tl_css_style_selector']['description'] = ['Description', 'A short hint for editors what the style is meant for. It is shown next to the name in the style selection.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['cssClasses'] = ['CSS classes', 'Please provide one or more CSS classes separated by spaces.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['disableInArticle'] = ['Disable in articles', 'Choose this option if you wish to disable this style in articles.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['disableInCalendarEvent'] = ['Disable in calendar events', 'Choose this option if you wish to disable this style in calendar events.'];

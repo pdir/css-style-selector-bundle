@@ -23,6 +23,7 @@ $GLOBALS['TL_LANG']['tl_css_style_selector']['restriction_legend'] = 'Einschrän
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_css_style_selector']['styleDesignation'] = ['Stil Bezeichnung', 'Bitte geben Sie eine Stil Bezeichnung ein.'];
+$GLOBALS['TL_LANG']['tl_css_style_selector']['description'] = ['Beschreibung', 'Ein kurzer Hinweis für Redakteure, wofür der Stil gedacht ist. Er wird in der Stil-Auswahl hinter der Bezeichnung angezeigt.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['cssClasses'] = ['CSS-Klassen', 'Bitte geben Sie eine oder mehrere CSS-Klassen mit jeweils einem Leerzeichen getrennt ein.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['disableInArticle'] = ['In Artikeln deaktivieren', 'Bitte wählen Sie dieses Feld aus, um den Stil in den Artikeln zu deaktivieren.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['disableInCalendarEvent'] = ['In Kalender Terminen deaktivieren', 'Bitte wählen Sie dieses Feld aus, um den Stil in den Kalender Terminen zu deaktivieren.'];

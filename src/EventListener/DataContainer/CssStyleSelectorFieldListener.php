@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace Craffft\CssStyleSelectorBundle\EventListener\DataContainer;
 
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Contao\StringUtil;
 use Craffft\CssStyleSelectorBundle\Models\CssStyleSelectorModel;
 use Craffft\CssStyleSelectorBundle\Repository\CssStyleRepository;
 use Doctrine\DBAL\Connection;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Handles the "cssStyleSelector" field in all supported tables: adds it to the
@@ -56,6 +58,8 @@ class CssStyleSelectorFieldListener
 {
     public const FIELD = 'cssStyleSelector';
 
+    public const LEGEND = 'css_style_selector_legend';
+
     /**
      * Table => [style type, CSS class field, whether the CSS class field is a
      * serialized [id, class] pair, field holding the element type].
@@ -75,13 +79,15 @@ class CssStyleSelectorFieldListener
     public function __construct(
         private readonly Connection $connection,
         private readonly CssStyleRepository $repository,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
     /**
-     * Adds the field in front of the CSS class field of every palette. This runs
-     * on load so that palettes registered late (e.g. by RockSolid Custom
-     * Elements or other extensions) are covered as well.
+     * Adds the field in its own legend after the first legend of every palette
+     * that contains the CSS class field. This runs on load so that palettes
+     * registered late (e.g. by RockSolid Custom Elements or other extensions)
+     * are covered as well.
      */
     public function addToPalettes(DataContainer $dc): void
     {
@@ -91,18 +97,36 @@ class CssStyleSelectorFieldListener
             return;
         }
 
+        // Do not show an empty selection if there are no styles for this record
+        if ('edit' === $this->requestStack->getCurrentRequest()?->query->get('act') && !$this->getOptions($dc)) {
+            return;
+        }
+
+        $GLOBALS['TL_LANG'][$table][self::LEGEND] ??= $GLOBALS['TL_LANG']['MSC']['cssStyleSelectorLegend'] ?? self::LEGEND;
+
         $classField = preg_quote(self::TABLES[$table][1], '/');
 
         foreach ($GLOBALS['TL_DCA'][$table]['palettes'] ?? [] as $name => $palette) {
-            if ('__selector__' === $name || !\is_string($palette) || preg_match('/(?:^|[,;])'.self::FIELD.'(?:[,;]|$)/', $palette)) {
+            if (
+                '__selector__' === $name
+                || !\is_string($palette)
+                || !preg_match('/(?:^|[,;])'.$classField.'(?:[,;]|$)/', $palette)
+                || preg_match('/(?:^|[,;])'.self::FIELD.'(?:[,;]|$)/', $palette)
+            ) {
                 continue;
             }
 
-            $GLOBALS['TL_DCA'][$table]['palettes'][$name] = preg_replace(
-                '/(^|[,;])('.$classField.')(?=[,;]|$)/',
-                '$1'.self::FIELD.',$2',
-                $palette,
-            );
+            if (preg_match('/^\{([^},:]+)/', $palette, $matches)) {
+                $palette = PaletteManipulator::create()
+                    ->addLegend(self::LEGEND, $matches[1], PaletteManipulator::POSITION_AFTER)
+                    ->addField(self::FIELD, self::LEGEND, PaletteManipulator::POSITION_APPEND)
+                    ->applyToString($palette)
+                ;
+            } else {
+                $palette = preg_replace('/(^|[,;])('.$classField.')(?=[,;]|$)/', '$1'.self::FIELD.',$2', $palette);
+            }
+
+            $GLOBALS['TL_DCA'][$table]['palettes'][$name] = $palette;
         }
     }
 
@@ -128,7 +152,9 @@ class CssStyleSelectorFieldListener
     /**
      * Synchronizes the CSS classes of the selected styles with the CSS class
      * field after all fields have been saved: classes of all known styles are
-     * removed first, then the classes of the selected styles are added.
+     * removed first, then the classes of the selected styles are added. Styles
+     * that are no longer available for the record (e.g. after changing the
+     * element type) are deselected.
      */
     public function applyCssClasses(DataContainer $dc): void
     {
@@ -138,14 +164,12 @@ class CssStyleSelectorFieldListener
             return;
         }
 
-        [, $classField, $serialized] = self::TABLES[$table];
+        [$type, $classField, $serialized, $typeField] = self::TABLES[$table];
 
         $row = $this->connection->fetchAssociative(
             \sprintf(
-                'SELECT %s, %s FROM %s WHERE id = ?',
-                $this->connection->quoteIdentifier(self::FIELD),
-                $this->connection->quoteIdentifier($classField),
-                $table,
+                'SELECT * FROM %s WHERE id = ?',
+                $this->connection->quoteIdentifier($table),
             ),
             [$dc->id],
         );
@@ -154,20 +178,32 @@ class CssStyleSelectorFieldListener
             return;
         }
 
+        $storedIds = StringUtil::deserialize($row[self::FIELD], true);
+        $availableIds = array_keys($this->repository->findOptions($type, null !== $typeField ? ($row[$typeField] ?? null) : null));
+        $selectedIds = array_values(array_filter($storedIds, static fn ($id): bool => \in_array((int) $id, $availableIds, true)));
+
         $cssId = $serialized ? StringUtil::deserialize($row[$classField], true) : null;
         $currentClasses = $serialized ? (string) ($cssId[1] ?? '') : (string) $row[$classField];
 
         $classes = array_diff(CssStyleRepository::splitClasses($currentClasses), $this->repository->findAllCssClasses());
-        $classes = array_merge($classes, $this->repository->findCssClassesByIds(StringUtil::deserialize($row[self::FIELD], true)));
+        $classes = array_merge($classes, $this->repository->findCssClassesByIds($selectedIds));
         $newClasses = implode(' ', array_unique($classes));
 
-        if ($newClasses === $currentClasses) {
+        $data = [];
+
+        if ($newClasses !== $currentClasses) {
+            $data[$this->connection->quoteIdentifier($classField)] = $serialized ? serialize([$cssId[0] ?? '', $newClasses]) : $newClasses;
+        }
+
+        if ($selectedIds !== $storedIds) {
+            $data[$this->connection->quoteIdentifier(self::FIELD)] = $selectedIds ? serialize($selectedIds) : null;
+        }
+
+        if (!$data) {
             return;
         }
 
-        $value = $serialized ? serialize([$cssId[0] ?? '', $newClasses]) : $newClasses;
-
-        $this->connection->update($table, [$this->connection->quoteIdentifier($classField) => $value], ['id' => (int) $dc->id]);
+        $this->connection->update($table, $data, ['id' => (int) $dc->id]);
 
         DataContainer::clearCurrentRecordCache($dc->id, $table);
     }

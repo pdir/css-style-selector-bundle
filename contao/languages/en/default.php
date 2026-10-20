@@ -15,3 +15,4 @@ declare(strict_types=1);
  * Miscellaneous
  */
 $GLOBALS['TL_LANG']['MSC']['cssStyleSelector'] = ['CSS style selection', 'You can select the CSS styles with the predefined CSS classes here.'];
+$GLOBALS['TL_LANG']['MSC']['cssStyleSelectorLegend'] = 'CSS style';

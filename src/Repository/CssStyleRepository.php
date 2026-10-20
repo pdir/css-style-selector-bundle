@@ -28,7 +28,8 @@ class CssStyleRepository
 
     /**
      * Returns the styles available for the given type (and element type, e.g.
-     * the content element type), keyed by ID and sorted naturally.
+     * the content element type), keyed by ID and sorted naturally. The label
+     * contains the description of the style, if there is one.
      *
      * @return array<int, string>
      */
@@ -39,7 +40,7 @@ class CssStyleRepository
         }
 
         $restriction = CssStyleSelectorModel::TYPE_RESTRICTIONS[$type] ?? null;
-        $columns = ['id', 'styleDesignation', ...($restriction ?? [])];
+        $columns = ['id', 'styleDesignation', 'description', ...($restriction ?? [])];
 
         $rows = $this->connection->fetchAllAssociative(
             \sprintf(
@@ -61,7 +62,13 @@ class CssStyleRepository
                 }
             }
 
-            $options[(int) $row['id']] = (string) $row['styleDesignation'];
+            $label = (string) $row['styleDesignation'];
+
+            if ('' !== (string) $row['description']) {
+                $label .= ' – '.$row['description'];
+            }
+
+            $options[(int) $row['id']] = $label;
         }
 
         natcasesort($options);

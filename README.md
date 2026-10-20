@@ -39,10 +39,15 @@ Usage
 
 Go to *Layout → CSS styles* and create your styles.
 
+- **Description:** an optional short hint for editors, shown next to the name
+  in the style selection.
 - **Permissions:** disable a style for whole areas, e.g. "Disable in pages".
 - **Restrictions:** limit a style to certain content element, module or form
   field types (e.g. only for `text` and `image` elements). If a restriction is
   active, the style is only offered for the selected types.
+
+Editors find the style selection in its own "CSS style" section near the top
+of the form. It is hidden if no styles are available for the record.
 
 When a record is saved, the classes of all styles are removed from its CSS
 class field and the classes of the selected styles are added again. Classes
