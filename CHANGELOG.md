@@ -11,14 +11,17 @@ Types of changes
 )
 
 
-## [2.0.0](https://github.com/pdir/css-style-selector-bundle/tree/2.0.0) – unreleased
+## [2.1.0](https://github.com/pdir/css-style-selector-bundle/tree/2.1.0) – unreleased
 
-- [Added] Support for Contao 6
-- [Added] Limit styles to certain content element, module and form field types
 - [Added] Optional description per style, shown next to the name in the style selection
 - [Changed] The style selection is shown in its own "CSS style" legend after the first legend instead of the collapsed expert legend
 - [Changed] The style selection is hidden if no styles are available for the edited record
 - [Changed] Styles that are no longer available for a record (e.g. after changing the element type) are deselected on save
+
+## [2.0.0](https://github.com/pdir/css-style-selector-bundle/tree/2.0.0) – unreleased
+
+- [Added] Support for Contao 6
+- [Added] Limit styles to certain content element, module and form field types
 - [Changed] Require PHP 8.1 and Contao 5.3 or higher
 - [Changed] Use Doctrine DBAL, services and `#[AsCallback]` attributes instead of `Contao\Database`, `Contao\Input` and DCA closures
 - [Changed] The CSS classes are now applied in an `onsubmit_callback`, so they also work in "edit multiple" mode and no longer manipulate the POST data
