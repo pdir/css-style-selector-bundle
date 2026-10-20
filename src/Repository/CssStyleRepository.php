@@ -15,65 +15,131 @@ namespace Craffft\CssStyleSelectorBundle\Repository;
 
 use Contao\StringUtil;
 use Craffft\CssStyleSelectorBundle\Models\CssStyleSelectorModel;
-use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\InvalidFieldNameException;
+use Doctrine\DBAL\Exception\TableNotFoundException;
+use Symfony\Contracts\Service\ResetInterface;
 
-class CssStyleRepository
+class CssStyleRepository implements ResetInterface
 {
-    private const TABLE = 'tl_css_style_selector';
+    /**
+     * @var array<int, array<string, mixed>>|null
+     */
+    private array|null $styles = null;
 
     public function __construct(private readonly Connection $connection)
     {
     }
 
     /**
-     * Returns the styles available for the given type (and element type, e.g.
-     * the content element type), keyed by ID and sorted naturally. The label
-     * contains the description of the style, if there is one.
+     * Returns all styles with the data of their group, keyed by ID and ordered
+     * by group and manual sorting.
      *
-     * @return array<int, string>
+     * @return array<int, array<string, mixed>>
      */
-    public function findOptions(string $type, string|null $elementType = null): array
+    public function findAll(): array
+    {
+        if (null !== $this->styles) {
+            return $this->styles;
+        }
+
+        try {
+            $rows = $this->connection->fetchAllAssociative(
+                'SELECT s.*, g.title AS groupTitle, g.multiple AS groupMultiple, g.limitUserGroups AS groupLimitUserGroups, g.userGroups AS groupUserGroups
+                FROM tl_css_style_selector s
+                LEFT JOIN tl_css_style_group g ON g.id = s.pid
+                ORDER BY g.title, s.sorting, s.styleDesignation',
+            );
+        } catch (InvalidFieldNameException|TableNotFoundException) {
+            // The database has not been migrated yet
+            $rows = [];
+        }
+
+        $this->styles = [];
+
+        foreach ($rows as $row) {
+            $row['id'] = (int) $row['id'];
+            $row['pid'] = (int) $row['pid'];
+
+            // Styles without a group behave like a group with multiple selection
+            $row['groupMultiple'] = !$row['pid'] || $row['groupMultiple'];
+
+            $this->styles[$row['id']] = $row;
+        }
+
+        return $this->styles;
+    }
+
+    /**
+     * Returns the styles available for the given type (and element type, e.g.
+     * the content element type). If user groups are given, styles of groups
+     * that are limited to other user groups are skipped.
+     *
+     * @param array<int>|null $userGroups
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function findAvailable(string $type, string|null $elementType = null, array|null $userGroups = null): array
     {
         if (!\in_array($type, CssStyleSelectorModel::getAvailableTypes(), true)) {
             return [];
         }
 
+        $disableField = CssStyleSelectorModel::getDisableField($type);
         $restriction = CssStyleSelectorModel::TYPE_RESTRICTIONS[$type] ?? null;
-        $columns = ['id', 'styleDesignation', 'description', ...($restriction ?? [])];
 
-        $rows = $this->connection->fetchAllAssociative(
-            \sprintf(
-                'SELECT %s FROM %s WHERE %s = 0',
-                implode(', ', array_map(fn (string $column): string => $this->connection->quoteIdentifier($column), $columns)),
-                self::TABLE,
-                $this->connection->quoteIdentifier(CssStyleSelectorModel::getDisableField($type)),
-            ),
-        );
-
-        $options = [];
-
-        foreach ($rows as $row) {
-            if (null !== $restriction) {
-                [$limitField, $allowedField] = $restriction;
-
-                if ($row[$limitField] && !\in_array($elementType, StringUtil::deserialize($row[$allowedField], true), true)) {
-                    continue;
+        return array_filter(
+            $this->findAll(),
+            static function (array $style) use ($disableField, $restriction, $elementType, $userGroups): bool {
+                if ($style[$disableField]) {
+                    return false;
                 }
-            }
 
-            $label = (string) $row['styleDesignation'];
+                if (null !== $restriction) {
+                    [$limitField, $allowedField] = $restriction;
 
-            if ('' !== (string) $row['description']) {
-                $label .= ' – '.$row['description'];
-            }
+                    if ($style[$limitField] && !\in_array($elementType, StringUtil::deserialize($style[$allowedField], true), true)) {
+                        return false;
+                    }
+                }
 
-            $options[(int) $row['id']] = $label;
-        }
+                if (null !== $userGroups && $style['groupLimitUserGroups']) {
+                    $allowedGroups = array_map(intval(...), StringUtil::deserialize($style['groupUserGroups'], true));
 
-        natcasesort($options);
+                    if (!array_intersect($userGroups, $allowedGroups)) {
+                        return false;
+                    }
+                }
 
-        return $options;
+                return true;
+            },
+        );
+    }
+
+    /**
+     * @param array<int>|null $userGroups
+     *
+     * @return array<int, string>
+     */
+    public function findOptions(string $type, string|null $elementType = null, array|null $userGroups = null): array
+    {
+        return array_map(
+            static fn (array $style): string => (string) $style['styleDesignation'],
+            $this->findAvailable($type, $elementType, $userGroups),
+        );
+    }
+
+    /**
+     * @param array<int|string> $ids
+     *
+     * @return array<int, string>
+     */
+    public function findDesignationsByIds(array $ids): array
+    {
+        return array_map(
+            static fn (array $style): string => (string) $style['styleDesignation'],
+            $this->findByIds($ids),
+        );
     }
 
     /**
@@ -83,19 +149,7 @@ class CssStyleRepository
      */
     public function findCssClassesByIds(array $ids): array
     {
-        $ids = array_values(array_unique(array_map(intval(...), $ids)));
-
-        if (!$ids) {
-            return [];
-        }
-
-        $classes = $this->connection->fetchFirstColumn(
-            'SELECT cssClasses FROM '.self::TABLE.' WHERE id IN (?)',
-            [$ids],
-            [ArrayParameterType::INTEGER],
-        );
-
-        return self::splitClasses(implode(' ', $classes));
+        return self::splitClasses(implode(' ', array_column($this->findByIds($ids), 'cssClasses')));
     }
 
     /**
@@ -105,9 +159,12 @@ class CssStyleRepository
      */
     public function findAllCssClasses(): array
     {
-        $classes = $this->connection->fetchFirstColumn('SELECT cssClasses FROM '.self::TABLE);
+        return self::splitClasses(implode(' ', array_column($this->findAll(), 'cssClasses')));
+    }
 
-        return self::splitClasses(implode(' ', $classes));
+    public function reset(): void
+    {
+        $this->styles = null;
     }
 
     /**
@@ -118,5 +175,15 @@ class CssStyleRepository
         $split = preg_split('/\s+/', trim((string) $classes), -1, PREG_SPLIT_NO_EMPTY) ?: [];
 
         return array_values(array_unique($split));
+    }
+
+    /**
+     * @param array<int|string> $ids
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function findByIds(array $ids): array
+    {
+        return array_intersect_key($this->findAll(), array_flip(array_map(intval(...), $ids)));
     }
 }

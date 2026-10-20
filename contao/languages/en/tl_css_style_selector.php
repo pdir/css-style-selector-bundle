@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 $GLOBALS['TL_LANG']['tl_css_style_selector']['style_legend'] = 'Style';
 $GLOBALS['TL_LANG']['tl_css_style_selector']['css_legend'] = 'CSS';
+$GLOBALS['TL_LANG']['tl_css_style_selector']['preview_legend'] = 'Preview';
 $GLOBALS['TL_LANG']['tl_css_style_selector']['permissions_legend'] = 'Permissions';
 $GLOBALS['TL_LANG']['tl_css_style_selector']['restriction_legend'] = 'Restrictions';
 
@@ -25,6 +26,8 @@ $GLOBALS['TL_LANG']['tl_css_style_selector']['restriction_legend'] = 'Restrictio
 $GLOBALS['TL_LANG']['tl_css_style_selector']['styleDesignation'] = ['Style name', 'Please provide a name for this style.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['description'] = ['Description', 'A short hint for editors what the style is meant for. It is shown next to the name in the style selection.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['cssClasses'] = ['CSS classes', 'Please provide one or more CSS classes separated by spaces.'];
+$GLOBALS['TL_LANG']['tl_css_style_selector']['previewColor'] = ['Preview color', 'A color shown to editors as a preview in the style selection.'];
+$GLOBALS['TL_LANG']['tl_css_style_selector']['previewImage'] = ['Preview image', 'A small image shown to editors as a preview in the style selection.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['disableInArticle'] = ['Disable in articles', 'Choose this option if you wish to disable this style in articles.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['disableInCalendarEvent'] = ['Disable in calendar events', 'Choose this option if you wish to disable this style in calendar events.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['disableInContent'] = ['Disable in content elements', 'Choose this option if you wish to disable this style in content elements.'];
@@ -54,6 +57,8 @@ $GLOBALS['TL_LANG']['tl_css_style_selector']['moduleEnabled'] = ['Module', 'Enab
 $GLOBALS['TL_LANG']['tl_css_style_selector']['newsEnabled'] = ['News', 'Enabled in news.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['pageEnabled'] = ['Page', 'Enabled in pages.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['limited'] = 'limited';
+$GLOBALS['TL_LANG']['tl_css_style_selector']['disabledIn'] = 'Disabled in';
+$GLOBALS['TL_LANG']['tl_css_style_selector']['cut'] = ['Move CSS style', 'Move CSS style ID %s'];
 
 /**
  * Buttons

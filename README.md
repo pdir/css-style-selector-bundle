@@ -37,18 +37,39 @@ vendor/bin/contao-console contao:migrate
 Usage
 -----
 
-Go to *Layout → CSS styles* and create your styles.
+Go to *Layout → CSS styles*, create a group and add your styles to it.
 
-- **Description:** an optional short hint for editors, shown next to the name
-  in the style selection.
+**Groups**
+
+- Each group is shown as its own section in the style selection.
+- Without *Multiple selection*, editors can pick only one style per group
+  (e.g. "Background: light / dark"), so conflicting classes are not possible.
+- *Limit to user groups* offers the styles of a group to certain back end user
+  groups only. Administrators always see all styles. Styles selected by other
+  users are kept when an editor without access saves the record.
+
+**Styles**
+
+- **Description:** an optional short hint for editors, shown in the selection.
+- **Preview:** an optional color and/or image, shown as a tile in the selection.
+- **Sorting:** drag and drop the styles to define their order.
 - **Permissions:** disable a style for whole areas, e.g. "Disable in pages".
 - **Restrictions:** limit a style to certain content element, module or form
   field types (e.g. only for `text` and `image` elements). If a restriction is
   active, the style is only offered for the selected types.
 
-Editors find the style selection in its own "CSS style" section near the top
-of the form. It is hidden if no styles are available for the record.
+**For editors**
 
-When a record is saved, the classes of all styles are removed from its CSS
-class field and the classes of the selected styles are added again. Classes
-you entered manually stay untouched, unless they are also used by a style.
+The style selection is shown in its own "CSS style" section near the top of
+the form. It is hidden if no styles are available for the record. The list
+views show the selected styles next to each record.
+
+The CSS class field only shows the classes you entered yourself. The classes
+of the selected styles are added when the record is saved and are stored in
+the CSS class field, so they work with every template. Classes that belong to
+a style can only be set through the style selection.
+
+**Updating from version 2.0**
+
+Run `vendor/bin/contao-console contao:migrate`. Existing styles are moved into
+the group "Styles", which allows multiple selection like before.

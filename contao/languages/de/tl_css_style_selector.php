@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 $GLOBALS['TL_LANG']['tl_css_style_selector']['style_legend'] = 'Stil';
 $GLOBALS['TL_LANG']['tl_css_style_selector']['css_legend'] = 'CSS';
+$GLOBALS['TL_LANG']['tl_css_style_selector']['preview_legend'] = 'Vorschau';
 $GLOBALS['TL_LANG']['tl_css_style_selector']['permissions_legend'] = 'Berechtigungen';
 $GLOBALS['TL_LANG']['tl_css_style_selector']['restriction_legend'] = 'Einschränkungen';
 
@@ -25,6 +26,8 @@ $GLOBALS['TL_LANG']['tl_css_style_selector']['restriction_legend'] = 'Einschrän
 $GLOBALS['TL_LANG']['tl_css_style_selector']['styleDesignation'] = ['Stil Bezeichnung', 'Bitte geben Sie eine Stil Bezeichnung ein.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['description'] = ['Beschreibung', 'Ein kurzer Hinweis für Redakteure, wofür der Stil gedacht ist. Er wird in der Stil-Auswahl hinter der Bezeichnung angezeigt.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['cssClasses'] = ['CSS-Klassen', 'Bitte geben Sie eine oder mehrere CSS-Klassen mit jeweils einem Leerzeichen getrennt ein.'];
+$GLOBALS['TL_LANG']['tl_css_style_selector']['previewColor'] = ['Vorschaufarbe', 'Eine Farbe, die Redakteuren in der Stil-Auswahl als Vorschau angezeigt wird.'];
+$GLOBALS['TL_LANG']['tl_css_style_selector']['previewImage'] = ['Vorschaubild', 'Ein kleines Bild, das Redakteuren in der Stil-Auswahl als Vorschau angezeigt wird.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['disableInArticle'] = ['In Artikeln deaktivieren', 'Bitte wählen Sie dieses Feld aus, um den Stil in den Artikeln zu deaktivieren.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['disableInCalendarEvent'] = ['In Kalender Terminen deaktivieren', 'Bitte wählen Sie dieses Feld aus, um den Stil in den Kalender Terminen zu deaktivieren.'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['disableInContent'] = ['In Content Elementen deaktivieren', 'Bitte wählen Sie dieses Feld aus, um den Stil in den Content Elementen zu deaktivieren.'];
@@ -46,7 +49,7 @@ $GLOBALS['TL_LANG']['tl_css_style_selector']['formFields'] = ['Formularfelder', 
  */
 $GLOBALS['TL_LANG']['tl_css_style_selector']['articleEnabled'] = ['Artikel', 'In Artikel aktiviert'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['calendarEventEnabled'] = ['Termin', 'In Kalender Termin aktiviert'];
-$GLOBALS['TL_LANG']['tl_css_style_selector']['contentEnabled'] = ['CE', 'In Content Element aktiviert'];
+$GLOBALS['TL_LANG']['tl_css_style_selector']['contentEnabled'] = ['Inhaltselement', 'In Content Element aktiviert'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['formEnabled'] = ['Formular', 'In Formular aktiviert'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['formFieldEnabled'] = ['Formular Feld', 'In Formular Feld aktiviert'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['layoutEnabled'] = ['Layout', 'In Layout aktiviert'];
@@ -54,6 +57,8 @@ $GLOBALS['TL_LANG']['tl_css_style_selector']['moduleEnabled'] = ['Modul', 'In Mo
 $GLOBALS['TL_LANG']['tl_css_style_selector']['newsEnabled'] = ['Neuigkeiten', 'In Neuigkeiten aktiviert'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['pageEnabled'] = ['Seite', 'In Seite aktiviert'];
 $GLOBALS['TL_LANG']['tl_css_style_selector']['limited'] = 'eingeschränkt';
+$GLOBALS['TL_LANG']['tl_css_style_selector']['disabledIn'] = 'Deaktiviert in';
+$GLOBALS['TL_LANG']['tl_css_style_selector']['cut'] = ['CSS-Stil verschieben', 'CSS-Stil ID %s verschieben'];
 
 /**
  * Buttons

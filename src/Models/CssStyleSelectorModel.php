@@ -17,8 +17,11 @@ use Contao\Model;
 
 /**
  * @property int         $id
+ * @property int         $pid
+ * @property int         $sorting
  * @property int         $tstamp
  * @property string      $styleDesignation
+ * @property string      $description
  * @property string      $cssClasses
  * @property bool        $disableInArticle
  * @property bool        $disableInCalendarEvent
@@ -35,6 +38,8 @@ use Contao\Model;
  * @property string|null $modules
  * @property bool        $limitFormFields
  * @property string|null $formFields
+ * @property string      $previewColor
+ * @property string|null $previewImage
  */
 class CssStyleSelectorModel extends Model
 {

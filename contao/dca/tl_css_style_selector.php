@@ -18,11 +18,13 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = [
     // Config
     'config' => [
         'dataContainer' => DC_Table::class,
+        'ptable' => 'tl_css_style_group',
         'enableVersioning' => true,
         'markAsCopy' => 'styleDesignation',
         'sql' => [
             'keys' => [
                 'id' => 'primary',
+                'pid,sorting' => 'index',
             ],
         ],
     ],
@@ -30,22 +32,22 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = [
     // List
     'list' => [
         'sorting' => [
-            'mode' => DataContainer::MODE_SORTED,
-            'fields' => ['styleDesignation'],
-            'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'mode' => DataContainer::MODE_PARENT,
+            'fields' => ['sorting'],
+            'headerFields' => ['title', 'multiple', 'limitUserGroups'],
             'panelLayout' => 'filter;search,limit',
         ],
         'label' => [
-            'fields' => ['styleDesignation', 'cssClasses', 'articleEnabled', 'calendarEventEnabled', 'contentEnabled', 'formEnabled', 'formFieldEnabled', 'layoutEnabled', 'moduleEnabled', 'newsEnabled', 'pageEnabled'],
-            'showColumns' => true,
+            'fields' => ['styleDesignation', 'cssClasses'],
+            'format' => '%s <span class="label-info">[%s]</span>',
         ],
-        'operations' => ['edit', 'copy', 'delete', 'show'],
+        'operations' => ['edit', 'copy', 'cut', 'delete', 'show'],
     ],
 
     // Palettes
     'palettes' => [
         '__selector__' => ['limitContentElements', 'limitModules', 'limitFormFields'],
-        'default' => '{style_legend},styleDesignation,description;{css_legend},cssClasses;{permissions_legend},disableInArticle,disableInContent,disableInCalendarEvent,disableInForm,disableInFormField,disableInLayout,disableInModule,disableInNews,disableInPage;{restriction_legend},limitContentElements,limitModules,limitFormFields',
+        'default' => '{style_legend},styleDesignation,description;{css_legend},cssClasses;{preview_legend},previewColor,previewImage;{permissions_legend},disableInArticle,disableInContent,disableInCalendarEvent,disableInForm,disableInFormField,disableInLayout,disableInModule,disableInNews,disableInPage;{restriction_legend},limitContentElements,limitModules,limitFormFields',
     ],
 
     // Subpalettes
@@ -59,6 +61,14 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = [
     'fields' => [
         'id' => [
             'sql' => ['type' => 'integer', 'unsigned' => true, 'autoincrement' => true],
+        ],
+        'pid' => [
+            'foreignKey' => 'tl_css_style_group.title',
+            'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy'],
+        ],
+        'sorting' => [
+            'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
         ],
         'tstamp' => [
             'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
@@ -83,6 +93,18 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = [
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
+        ],
+        'previewColor' => [
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['maxlength' => 6, 'colorpicker' => true, 'isHexColor' => true, 'decodeEntities' => true, 'tl_class' => 'w50 wizard'],
+            'sql' => ['type' => 'string', 'length' => 6, 'default' => ''],
+        ],
+        'previewImage' => [
+            'exclude' => true,
+            'inputType' => 'fileTree',
+            'eval' => ['fieldType' => 'radio', 'filesOnly' => true, 'extensions' => '%contao.image.valid_extensions%', 'tl_class' => 'w50'],
+            'sql' => ['type' => 'binary', 'length' => 16, 'fixed' => true, 'notnull' => false],
         ],
         'disableInArticle' => [
             'exclude' => true,
@@ -180,15 +202,5 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = [
             'eval' => ['mandatory' => true, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
             'sql' => 'blob NULL',
         ],
-        // Virtual fields for the list view columns
-        'articleEnabled' => [],
-        'calendarEventEnabled' => [],
-        'contentEnabled' => [],
-        'formEnabled' => [],
-        'formFieldEnabled' => [],
-        'layoutEnabled' => [],
-        'moduleEnabled' => [],
-        'newsEnabled' => [],
-        'pageEnabled' => [],
     ],
 ];

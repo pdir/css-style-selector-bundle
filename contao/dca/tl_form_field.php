@@ -16,7 +16,7 @@ declare(strict_types=1);
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['cssStyleSelector'] = [
     'label' => &$GLOBALS['TL_LANG']['MSC']['cssStyleSelector'],
     'exclude' => true,
-    'inputType' => 'select',
-    'eval' => ['chosen' => true, 'multiple' => true, 'tl_class' => 'clr'],
+    'inputType' => 'cssStyleSelector',
+    'eval' => ['multiple' => true, 'isAssociative' => true, 'tl_class' => 'clr'],
     'sql' => 'blob NULL',
 ];

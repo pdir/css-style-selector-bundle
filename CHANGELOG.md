@@ -13,7 +13,14 @@ Types of changes
 
 ## [2.1.0](https://github.com/pdir/css-style-selector-bundle/tree/2.1.0) – unreleased
 
+- [Added] Style groups: each group is shown as its own section, with single selection (radio buttons) or multiple selection
+- [Added] Limit style groups to certain back end user groups; styles selected by other users are kept
+- [Added] Manual sorting of styles via drag and drop
+- [Added] Preview color and preview image per style, shown as tiles in the style selection
+- [Added] The selected styles are shown in the list views (content elements, modules, pages, …)
 - [Added] Optional description per style, shown next to the name in the style selection
+- [Changed] The CSS class field only shows the manually entered classes; the classes of the selected styles are still saved in the field, so templates and the front end are unchanged
+- [Changed] Existing styles are moved into the group "Styles" with multiple selection by a migration, run `contao:migrate` after updating
 - [Changed] The style selection is shown in its own "CSS style" legend after the first legend instead of the collapsed expert legend
 - [Changed] The style selection is hidden if no styles are available for the edited record
 - [Changed] Styles that are no longer available for a record (e.g. after changing the element type) are deselected on save
