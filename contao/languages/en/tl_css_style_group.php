@@ -21,7 +21,9 @@ $GLOBALS['TL_LANG']['tl_css_style_group']['permissions_legend'] = 'Permissions';
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_css_style_group']['title'] = ['Title', 'Please enter the title of the group, e.g. "Background" or "Spacing".'];
+$GLOBALS['TL_LANG']['tl_css_style_group']['description'] = ['Description', 'An optional hint for editors, shown below the group title in the style selection.'];
 $GLOBALS['TL_LANG']['tl_css_style_group']['multiple'] = ['Multiple selection', 'Allow several styles of this group at the same time. Without this option, only one style per group can be selected.'];
+$GLOBALS['TL_LANG']['tl_css_style_group']['sorting'] = ['Sorting', 'Groups with a lower value are shown further up in the style selection. New groups are added at the end automatically.'];
 $GLOBALS['TL_LANG']['tl_css_style_group']['limitUserGroups'] = ['Limit to user groups', 'Only offer the styles of this group to members of certain user groups. Administrators always see all styles.'];
 $GLOBALS['TL_LANG']['tl_css_style_group']['userGroups'] = ['User groups', 'Please choose the user groups that may use the styles of this group.'];
 

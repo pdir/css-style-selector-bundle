@@ -21,7 +21,9 @@ $GLOBALS['TL_LANG']['tl_css_style_group']['permissions_legend'] = 'Berechtigunge
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_css_style_group']['title'] = ['Titel', 'Bitte geben Sie den Titel der Gruppe ein, z. B. „Hintergrund“ oder „Abstand“.'];
+$GLOBALS['TL_LANG']['tl_css_style_group']['description'] = ['Beschreibung', 'Ein optionaler Hinweis für Redakteure, der unter dem Gruppentitel in der Stil-Auswahl angezeigt wird.'];
 $GLOBALS['TL_LANG']['tl_css_style_group']['multiple'] = ['Mehrfachauswahl', 'Mehrere Stile dieser Gruppe gleichzeitig erlauben. Ohne diese Option kann pro Gruppe nur ein Stil gewählt werden.'];
+$GLOBALS['TL_LANG']['tl_css_style_group']['sorting'] = ['Sortierung', 'Gruppen mit einem kleineren Wert werden in der Stil-Auswahl weiter oben angezeigt. Neue Gruppen werden automatisch ans Ende gestellt.'];
 $GLOBALS['TL_LANG']['tl_css_style_group']['limitUserGroups'] = ['Auf Benutzergruppen beschränken', 'Die Stile dieser Gruppe nur Mitgliedern bestimmter Benutzergruppen anbieten. Administratoren sehen immer alle Stile.'];
 $GLOBALS['TL_LANG']['tl_css_style_group']['userGroups'] = ['Benutzergruppen', 'Bitte wählen Sie die Benutzergruppen aus, die die Stile dieser Gruppe verwenden dürfen.'];
 

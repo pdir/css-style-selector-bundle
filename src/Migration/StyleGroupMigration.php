@@ -52,6 +52,7 @@ class StyleGroupMigration extends AbstractMigration
         $groupId = $this->connection->fetchOne('SELECT id FROM tl_css_style_group WHERE title = ? ORDER BY id LIMIT 1', [self::GROUP_TITLE]);
 
         if (false === $groupId) {
+            // The group sorting is added by the GroupSortingMigration if the column does not exist yet
             $this->connection->insert('tl_css_style_group', [
                 'tstamp' => time(),
                 'title' => self::GROUP_TITLE,

@@ -42,6 +42,9 @@ Go to *Layout → CSS styles*, create a group and add your styles to it.
 **Groups**
 
 - Each group is shown as its own section in the style selection.
+- *Sorting* defines the order of the groups (lower values first). New groups
+  are added at the end.
+- *Description* is an optional hint for editors, shown below the group title.
 - Without *Multiple selection*, editors can pick only one style per group
   (e.g. "Background: light / dark"), so conflicting classes are not possible.
 - *Limit to user groups* offers the styles of a group to certain back end user

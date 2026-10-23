@@ -76,8 +76,9 @@ class CssStyleSelectorWidget extends Widget
             }
 
             $html .= \sprintf(
-                '<fieldset class="css-style-selector__group"><legend>%s</legend><div class="css-style-selector__options">%s</div></fieldset>',
+                '<fieldset class="css-style-selector__group"><legend>%s</legend>%s<div class="css-style-selector__options">%s</div></fieldset>',
                 StringUtil::specialchars($group['title'] ?: ($GLOBALS['TL_LANG']['MSC']['cssStyleSelectorUngrouped'] ?? '')),
+                '' !== $group['description'] ? '<p class="css-style-selector__group-description">'.StringUtil::specialchars($group['description']).'</p>' : '',
                 $options,
             );
         }
@@ -137,7 +138,7 @@ class CssStyleSelectorWidget extends Widget
     }
 
     /**
-     * @return array<int, array{title: string, multiple: bool, styles: array<int, array<string, mixed>>}>
+     * @return array<int, array{title: string, description: string, multiple: bool, styles: array<int, array<string, mixed>>}>
      */
     private function getGroups(): array
     {
@@ -154,6 +155,7 @@ class CssStyleSelectorWidget extends Widget
 
             $groups[$style['pid']] ??= [
                 'title' => (string) ($style['groupTitle'] ?? ''),
+                'description' => (string) ($style['groupDescription'] ?? ''),
                 'multiple' => (bool) $style['groupMultiple'],
                 'styles' => [],
             ];
@@ -239,6 +241,7 @@ class CssStyleSelectorWidget extends Widget
             .css-style-selector{display:flex;flex-direction:column;gap:12px;margin:3px 0}
             .css-style-selector__group{border:0;margin:0;padding:0;min-width:0}
             .css-style-selector__group>legend{font-weight:600;margin-bottom:6px;padding:0}
+            .css-style-selector__group-description{margin:-2px 0 6px;color:var(--info,#7f7f7f);font-size:.75rem}
             .css-style-selector__options{display:flex;flex-wrap:wrap;gap:6px}
             .css-style-selector__option{display:flex;align-items:center;gap:8px;max-width:280px;padding:6px 10px;border:1px solid var(--form-border,#ccc);border-radius:var(--border-radius,4px);background:var(--form-bg,#fff);cursor:pointer;line-height:1.3}
             .css-style-selector__option:hover{background:var(--form-bg-hover,#f6f6f6)}

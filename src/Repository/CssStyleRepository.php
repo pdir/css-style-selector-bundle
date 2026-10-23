@@ -45,10 +45,10 @@ class CssStyleRepository implements ResetInterface
 
         try {
             $rows = $this->connection->fetchAllAssociative(
-                'SELECT s.*, g.title AS groupTitle, g.multiple AS groupMultiple, g.limitUserGroups AS groupLimitUserGroups, g.userGroups AS groupUserGroups
+                'SELECT s.*, g.title AS groupTitle, g.description AS groupDescription, g.multiple AS groupMultiple, g.limitUserGroups AS groupLimitUserGroups, g.userGroups AS groupUserGroups
                 FROM tl_css_style_selector s
                 LEFT JOIN tl_css_style_group g ON g.id = s.pid
-                ORDER BY g.title, s.sorting, s.styleDesignation',
+                ORDER BY g.sorting, g.title, s.sorting, s.styleDesignation',
             );
         } catch (InvalidFieldNameException|TableNotFoundException) {
             // The database has not been migrated yet

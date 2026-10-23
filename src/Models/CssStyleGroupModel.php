@@ -18,7 +18,9 @@ use Contao\Model;
 /**
  * @property int         $id
  * @property int         $tstamp
+ * @property int         $sorting
  * @property string      $title
+ * @property string      $description
  * @property bool        $multiple
  * @property bool        $limitUserGroups
  * @property string|null $userGroups

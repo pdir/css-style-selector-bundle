@@ -33,13 +33,13 @@ $GLOBALS['TL_DCA']['tl_css_style_group'] = [
     'list' => [
         'sorting' => [
             'mode' => DataContainer::MODE_SORTED,
-            'fields' => ['title'],
-            'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'fields' => ['sorting', 'title'],
+            'flag' => DataContainer::SORT_ASC,
             'panelLayout' => 'search,limit',
         ],
         'label' => [
-            'fields' => ['title'],
-            'format' => '%s',
+            'fields' => ['title', 'description'],
+            'format' => '%s <span class="tl_gray">%s</span>',
         ],
         'operations' => ['edit', 'children', 'copy', 'delete', 'show'],
     ],
@@ -47,7 +47,7 @@ $GLOBALS['TL_DCA']['tl_css_style_group'] = [
     // Palettes
     'palettes' => [
         '__selector__' => ['limitUserGroups'],
-        'default' => '{title_legend},title,multiple;{permissions_legend},limitUserGroups',
+        'default' => '{title_legend},title,description,multiple,sorting;{permissions_legend},limitUserGroups',
     ],
 
     // Subpalettes
@@ -63,11 +63,24 @@ $GLOBALS['TL_DCA']['tl_css_style_group'] = [
         'tstamp' => [
             'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
         ],
+        'sorting' => [
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'natural', 'maxlength' => 10, 'tl_class' => 'w50'],
+            'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
+        ],
         'title' => [
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
+        ],
+        'description' => [
+            'exclude' => true,
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => ['maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
         ],
         'multiple' => [

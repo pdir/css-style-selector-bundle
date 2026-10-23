@@ -16,6 +16,8 @@ Types of changes
 - [Added] Style groups: each group is shown as its own section, with single selection (radio buttons) or multiple selection
 - [Added] Limit style groups to certain back end user groups; styles selected by other users are kept
 - [Added] Manual sorting of styles via drag and drop
+- [Added] Manual sorting of style groups; existing groups keep their alphabetical order
+- [Added] Optional description per style group, shown below the group title in the style selection
 - [Added] Preview color and preview image per style, shown as tiles in the style selection
 - [Added] The selected styles are shown in the list views (content elements, modules, pages, …)
 - [Added] Optional description per style, shown next to the name in the style selection
