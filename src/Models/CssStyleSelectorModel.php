@@ -13,35 +13,14 @@ declare(strict_types=1);
 
 namespace Craffft\CssStyleSelectorBundle\Models;
 
-use Contao\Model;
-
 /**
- * @property int         $id
- * @property int         $pid
- * @property int         $sorting
- * @property int         $tstamp
- * @property string      $styleDesignation
- * @property string      $description
- * @property string      $cssClasses
- * @property bool        $disableInArticle
- * @property bool        $disableInCalendarEvent
- * @property bool        $disableInContent
- * @property bool        $disableInForm
- * @property bool        $disableInFormField
- * @property bool        $disableInLayout
- * @property bool        $disableInModule
- * @property bool        $disableInNews
- * @property bool        $disableInPage
- * @property bool        $limitContentElements
- * @property string|null $contentElements
- * @property bool        $limitModules
- * @property string|null $modules
- * @property bool        $limitFormFields
- * @property string|null $formFields
- * @property string      $previewColor
- * @property string|null $previewImage
+ * Areas (types) the style groups can be published in.
+ *
+ * The styles used to be records of the table tl_css_style_selector; since
+ * version 2.1 they are rows of their group (tl_css_style_group.styles), the
+ * table is only read by the StyleRowsMigration.
  */
-class CssStyleSelectorModel extends Model
+class CssStyleSelectorModel
 {
     public const TYPE_ARTICLE = 'article';
     public const TYPE_CALENDAR_EVENTS = 'calendarEvent';
@@ -59,16 +38,14 @@ class CssStyleSelectorModel extends Model
     public const TYPE_MODEL = self::TYPE_MODULE;
 
     /**
-     * Types whose styles can additionally be limited to certain element types,
-     * mapped to the "limit" checkbox and the field holding the allowed types.
+     * Types whose groups can additionally be limited to certain element types,
+     * mapped to the group field holding the allowed types (empty = all types).
      */
     public const TYPE_RESTRICTIONS = [
-        self::TYPE_CONTENT => ['limitContentElements', 'contentElements'],
-        self::TYPE_MODULE => ['limitModules', 'modules'],
-        self::TYPE_FORM_FIELD => ['limitFormFields', 'formFields'],
+        self::TYPE_CONTENT => 'contentElements',
+        self::TYPE_MODULE => 'modules',
+        self::TYPE_FORM_FIELD => 'formFields',
     ];
-
-    protected static $strTable = 'tl_css_style_selector';
 
     /**
      * @return list<string>
@@ -88,6 +65,17 @@ class CssStyleSelectorModel extends Model
         ];
     }
 
+    /**
+     * Field of the group that publishes it in the given area.
+     */
+    public static function getEnableField(string $type): string
+    {
+        return 'in'.ucfirst($type);
+    }
+
+    /**
+     * Field of the former style records that disabled them in the given area.
+     */
     public static function getDisableField(string $type): string
     {
         return 'disableIn'.ucfirst($type);
