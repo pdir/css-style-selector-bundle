@@ -20,91 +20,97 @@ use Doctrine\DBAL\Exception\InvalidFieldNameException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Symfony\Contracts\Service\ResetInterface;
 
+/**
+ * Reads the style groups. Each group holds its styles as rows of CSS classes
+ * and title; a selected style is stored by its CSS classes (the "style value"),
+ * so selections survive copying and importing records.
+ */
 class CssStyleRepository implements ResetInterface
 {
     /**
      * @var array<int, array<string, mixed>>|null
      */
-    private array|null $styles = null;
+    private array|null $groups = null;
 
     public function __construct(private readonly Connection $connection)
     {
     }
 
     /**
-     * Returns all styles with the data of their group, keyed by ID and ordered
-     * by group and manual sorting.
+     * Returns all groups with their styles (style value => title) and the
+     * data of their category, keyed by ID and ordered by category and group.
      *
      * @return array<int, array<string, mixed>>
      */
-    public function findAll(): array
+    public function findGroups(): array
     {
-        if (null !== $this->styles) {
-            return $this->styles;
+        if (null !== $this->groups) {
+            return $this->groups;
         }
 
         try {
             $rows = $this->connection->fetchAllAssociative(
-                'SELECT s.*, g.title AS groupTitle, g.description AS groupDescription, g.multiple AS groupMultiple, g.limitUserGroups AS groupLimitUserGroups, g.userGroups AS groupUserGroups
-                FROM tl_css_style_selector s
-                LEFT JOIN tl_css_style_group g ON g.id = s.pid
-                ORDER BY g.sorting, g.title, s.sorting, s.styleDesignation',
+                'SELECT g.*, c.title AS categoryTitle, c.description AS categoryDescription
+                FROM tl_css_style_group g
+                LEFT JOIN tl_css_style_category c ON c.id = g.pid
+                ORDER BY c.sorting, c.title, g.sorting, g.title',
             );
         } catch (InvalidFieldNameException|TableNotFoundException) {
             // The database has not been migrated yet
             $rows = [];
         }
 
-        $this->styles = [];
+        $this->groups = [];
 
         foreach ($rows as $row) {
             $row['id'] = (int) $row['id'];
             $row['pid'] = (int) $row['pid'];
+            $row['multiple'] = (bool) $row['multiple'];
+            $row['styles'] = self::parseStyles($row['styles'] ?? null);
 
-            // Styles without a group behave like a group with multiple selection
-            $row['groupMultiple'] = !$row['pid'] || $row['groupMultiple'];
-
-            $this->styles[$row['id']] = $row;
+            if ($row['styles']) {
+                $this->groups[$row['id']] = $row;
+            }
         }
 
-        return $this->styles;
+        return $this->groups;
     }
 
     /**
-     * Returns the styles available for the given type (and element type, e.g.
-     * the content element type). If user groups are given, styles of groups
-     * that are limited to other user groups are skipped.
+     * Returns the groups available for the given type (and element type, e.g.
+     * the content element type). If user groups are given, groups that are
+     * limited to other user groups are skipped.
      *
      * @param array<int>|null $userGroups
      *
      * @return array<int, array<string, mixed>>
      */
-    public function findAvailable(string $type, string|null $elementType = null, array|null $userGroups = null): array
+    public function findAvailableGroups(string $type, string|null $elementType = null, array|null $userGroups = null): array
     {
         if (!\in_array($type, CssStyleSelectorModel::getAvailableTypes(), true)) {
             return [];
         }
 
-        $disableField = CssStyleSelectorModel::getDisableField($type);
+        $enableField = CssStyleSelectorModel::getEnableField($type);
         $restriction = CssStyleSelectorModel::TYPE_RESTRICTIONS[$type] ?? null;
 
         return array_filter(
-            $this->findAll(),
-            static function (array $style) use ($disableField, $restriction, $elementType, $userGroups): bool {
-                if ($style[$disableField]) {
+            $this->findGroups(),
+            static function (array $group) use ($enableField, $restriction, $elementType, $userGroups): bool {
+                if (!($group[$enableField] ?? false)) {
                     return false;
                 }
 
                 if (null !== $restriction) {
-                    [$limitField, $allowedField] = $restriction;
+                    $allowed = StringUtil::deserialize($group[$restriction] ?? null, true);
 
-                    if ($style[$limitField] && !\in_array($elementType, StringUtil::deserialize($style[$allowedField], true), true)) {
+                    if ($allowed && !\in_array($elementType, $allowed, true)) {
                         return false;
                     }
                 }
 
-                if (null !== $userGroups && $style['groupLimitUserGroups']) {
-                    $allowedGroups = array_map(intval(...), StringUtil::deserialize($style['groupUserGroups'], true));
+                if (null !== $userGroups && $group['limitUserGroups']) {
+                    $allowedGroups = array_map(intval(...), StringUtil::deserialize($group['userGroups'], true));
 
                     if (!array_intersect($userGroups, $allowedGroups)) {
                         return false;
@@ -117,39 +123,47 @@ class CssStyleRepository implements ResetInterface
     }
 
     /**
-     * @param array<int>|null $userGroups
+     * Returns the selected style values that belong to the given groups; for
+     * groups with single selection only the first one.
      *
-     * @return array<int, string>
-     */
-    public function findOptions(string $type, string|null $elementType = null, array|null $userGroups = null): array
-    {
-        return array_map(
-            static fn (array $style): string => (string) $style['styleDesignation'],
-            $this->findAvailable($type, $elementType, $userGroups),
-        );
-    }
-
-    /**
-     * @param array<int|string> $ids
-     *
-     * @return array<int, string>
-     */
-    public function findDesignationsByIds(array $ids): array
-    {
-        return array_map(
-            static fn (array $style): string => (string) $style['styleDesignation'],
-            $this->findByIds($ids),
-        );
-    }
-
-    /**
-     * @param array<int|string> $ids
+     * @param array<int, array<string, mixed>> $groups
+     * @param array<string>                    $values
      *
      * @return list<string>
      */
-    public function findCssClassesByIds(array $ids): array
+    public static function filterSelection(array $groups, array $values): array
     {
-        return self::splitClasses(implode(' ', array_column($this->findByIds($ids), 'cssClasses')));
+        $selected = [];
+
+        foreach ($groups as $group) {
+            $matches = array_values(array_intersect(array_map(strval(...), array_keys($group['styles'])), $values));
+
+            array_push($selected, ...($group['multiple'] ? $matches : \array_slice($matches, 0, 1)));
+        }
+
+        return array_values(array_unique($selected));
+    }
+
+    /**
+     * Returns the titles of the given style values.
+     *
+     * @param array<string> $values
+     *
+     * @return list<string>
+     */
+    public function findTitles(array $values): array
+    {
+        $titles = [];
+
+        foreach ($this->findGroups() as $group) {
+            foreach ($group['styles'] as $value => $title) {
+                if (\in_array((string) $value, $values, true)) {
+                    $titles[(string) $value] ??= $title;
+                }
+            }
+        }
+
+        return array_values($titles);
     }
 
     /**
@@ -159,12 +173,39 @@ class CssStyleRepository implements ResetInterface
      */
     public function findAllCssClasses(): array
     {
-        return self::splitClasses(implode(' ', array_column($this->findAll(), 'cssClasses')));
+        $classes = [];
+
+        foreach ($this->findGroups() as $group) {
+            $classes[] = implode(' ', array_keys($group['styles']));
+        }
+
+        return self::splitClasses(implode(' ', $classes));
     }
 
     public function reset(): void
     {
-        $this->styles = null;
+        $this->groups = null;
+    }
+
+    /**
+     * Returns the styles of a group (serialized rows of "key" = CSS classes
+     * and "value" = title) as style value => title.
+     *
+     * @return array<string, string>
+     */
+    public static function parseStyles(mixed $rows): array
+    {
+        $styles = [];
+
+        foreach (StringUtil::deserialize($rows, true) as $row) {
+            $value = implode(' ', self::splitClasses((string) ($row['key'] ?? '')));
+
+            if ('' !== $value) {
+                $styles[$value] ??= trim((string) ($row['value'] ?? '')) ?: $value;
+            }
+        }
+
+        return $styles;
     }
 
     /**
@@ -175,15 +216,5 @@ class CssStyleRepository implements ResetInterface
         $split = preg_split('/\s+/', trim((string) $classes), -1, PREG_SPLIT_NO_EMPTY) ?: [];
 
         return array_values(array_unique($split));
-    }
-
-    /**
-     * @param array<int|string> $ids
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function findByIds(array $ids): array
-    {
-        return array_intersect_key($this->findAll(), array_flip(array_map(intval(...), $ids)));
     }
 }
