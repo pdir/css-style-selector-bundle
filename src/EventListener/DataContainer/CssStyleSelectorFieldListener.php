@@ -25,13 +25,14 @@ use Craffft\CssStyleSelectorBundle\Repository\CssStyleRepository;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Handles the "cssStyleSelector" field in all supported tables: adds it to the
  * palettes, provides the options, shows the selected styles in the list views
  * and writes the CSS classes of the selected styles into the table's own CSS
- * class field. In the back end, the CSS class field only shows the classes
- * that were entered manually.
+ * class field. In the back end, the CSS class field does not show the classes
+ * of the selected styles.
  */
 #[AsCallback(table: 'tl_article', target: 'config.onload', method: 'onLoad', priority: -100)]
 #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', method: 'onLoad', priority: -100)]
@@ -60,6 +61,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 #[AsCallback(table: 'tl_module', target: 'fields.cssID.load', method: 'hideManagedClasses')]
 #[AsCallback(table: 'tl_news', target: 'fields.cssClass.load', method: 'hideManagedClasses')]
 #[AsCallback(table: 'tl_page', target: 'fields.cssClass.load', method: 'hideManagedClasses')]
+#[AsCallback(table: 'tl_article', target: 'fields.cssStyleSelector.save', method: 'rememberSelection')]
+#[AsCallback(table: 'tl_calendar_events', target: 'fields.cssStyleSelector.save', method: 'rememberSelection')]
+#[AsCallback(table: 'tl_content', target: 'fields.cssStyleSelector.save', method: 'rememberSelection')]
+#[AsCallback(table: 'tl_form', target: 'fields.cssStyleSelector.save', method: 'rememberSelection')]
+#[AsCallback(table: 'tl_form_field', target: 'fields.cssStyleSelector.save', method: 'rememberSelection')]
+#[AsCallback(table: 'tl_layout', target: 'fields.cssStyleSelector.save', method: 'rememberSelection')]
+#[AsCallback(table: 'tl_module', target: 'fields.cssStyleSelector.save', method: 'rememberSelection')]
+#[AsCallback(table: 'tl_news', target: 'fields.cssStyleSelector.save', method: 'rememberSelection')]
+#[AsCallback(table: 'tl_page', target: 'fields.cssStyleSelector.save', method: 'rememberSelection')]
 #[AsCallback(table: 'tl_article', target: 'config.onsubmit', method: 'applyCssClasses', priority: -100)]
 #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', method: 'applyCssClasses', priority: -100)]
 #[AsCallback(table: 'tl_content', target: 'config.onsubmit', method: 'applyCssClasses', priority: -100)]
@@ -69,7 +79,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 #[AsCallback(table: 'tl_module', target: 'config.onsubmit', method: 'applyCssClasses', priority: -100)]
 #[AsCallback(table: 'tl_news', target: 'config.onsubmit', method: 'applyCssClasses', priority: -100)]
 #[AsCallback(table: 'tl_page', target: 'config.onsubmit', method: 'applyCssClasses', priority: -100)]
-class CssStyleSelectorFieldListener
+class CssStyleSelectorFieldListener implements ResetInterface
 {
     public const FIELD = 'cssStyleSelector';
 
@@ -92,6 +102,13 @@ class CssStyleSelectorFieldListener
     ];
 
     private const TREE_MODES = [DataContainer::MODE_TREE, DataContainer::MODE_TREE_EXTENDED];
+
+    /**
+     * The selection before saving, for records whose style field was submitted.
+     *
+     * @var array<string, array<int, array<int|string>>>
+     */
+    private array $previousSelection = [];
 
     public function __construct(
         private readonly Connection $connection,
@@ -182,10 +199,16 @@ class CssStyleSelectorFieldListener
         return $this->repository->findOptions($type, $elementType, $userGroups);
     }
 
+    public function reset(): void
+    {
+        $this->previousSelection = [];
+    }
+
     /**
-     * Removes the classes of all styles from the CSS class field, so editors
-     * only see (and edit) the classes they entered themselves. The classes of
-     * the selected styles are added again on submit.
+     * Removes the classes of the selected styles from the CSS class field, so
+     * editors only see (and edit) the other classes. They are added again on
+     * submit. Classes of styles that are not selected stay visible, because
+     * they would otherwise get lost when the form is saved.
      */
     public function hideManagedClasses(mixed $value, DataContainer $dc): mixed
     {
@@ -193,7 +216,7 @@ class CssStyleSelectorFieldListener
             return $value;
         }
 
-        $managed = $this->repository->findAllCssClasses();
+        $managed = $this->repository->findCssClassesByIds(StringUtil::deserialize($dc->getCurrentRecord()[self::FIELD] ?? null, true));
 
         if (!self::TABLES[$dc->table][2]) {
             return implode(' ', array_diff(CssStyleRepository::splitClasses((string) $value), $managed));
@@ -206,9 +229,21 @@ class CssStyleSelectorFieldListener
     }
 
     /**
+     * Marks the record for synchronizing. A save that does not contain the style
+     * field, e.g. from a front end editor or an API, must not change the styles.
+     */
+    public function rememberSelection(mixed $value, DataContainer $dc): mixed
+    {
+        $this->previousSelection[$dc->table][(int) $dc->id] ??= StringUtil::deserialize($dc->getCurrentRecord()[self::FIELD] ?? null, true);
+
+        return $value;
+    }
+
+    /**
      * Synchronizes the CSS classes of the selected styles with the CSS class
-     * field after all fields have been saved: classes of all known styles are
-     * removed first, then the classes of the selected styles are added. Styles
+     * field after all fields have been saved: the classes of the previously
+     * selected styles are removed first, then the classes of the selected styles
+     * are added. Other classes are kept, even if they belong to a style. Styles
      * that are no longer available for the record (e.g. after changing the
      * element type) are deselected. User group permissions are not checked
      * here, so styles selected by other users are kept.
@@ -217,9 +252,12 @@ class CssStyleSelectorFieldListener
     {
         $table = $dc->table;
 
-        if (!$dc->id || !isset(self::TABLES[$table], $GLOBALS['TL_DCA'][$table]['fields'][self::FIELD])) {
+        if (!$dc->id || !isset(self::TABLES[$table], $GLOBALS['TL_DCA'][$table]['fields'][self::FIELD], $this->previousSelection[$table][(int) $dc->id])) {
             return;
         }
+
+        $previousIds = $this->previousSelection[$table][(int) $dc->id];
+        unset($this->previousSelection[$table][(int) $dc->id]);
 
         [$type, $classField, $serialized, $typeField] = self::TABLES[$table];
 
@@ -242,7 +280,7 @@ class CssStyleSelectorFieldListener
         $cssId = $serialized ? StringUtil::deserialize($row[$classField], true) : null;
         $currentClasses = $serialized ? (string) ($cssId[1] ?? '') : (string) $row[$classField];
 
-        $classes = array_diff(CssStyleRepository::splitClasses($currentClasses), $this->repository->findAllCssClasses());
+        $classes = array_diff(CssStyleRepository::splitClasses($currentClasses), $this->repository->findCssClassesByIds([...$previousIds, ...$storedIds]));
         $classes = array_merge($classes, $this->repository->findCssClassesByIds($selectedIds));
         $newClasses = implode(' ', array_unique($classes));
 

@@ -152,16 +152,6 @@ class CssStyleRepository implements ResetInterface
         return self::splitClasses(implode(' ', array_column($this->findByIds($ids), 'cssClasses')));
     }
 
-    /**
-     * Returns every CSS class managed by any style.
-     *
-     * @return list<string>
-     */
-    public function findAllCssClasses(): array
-    {
-        return self::splitClasses(implode(' ', array_column($this->findAll(), 'cssClasses')));
-    }
-
     public function reset(): void
     {
         $this->styles = null;

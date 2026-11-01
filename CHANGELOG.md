@@ -18,6 +18,8 @@ Types of changes
 - [Added] Manual sorting of styles via drag and drop
 - [Added] Manual sorting of style groups; existing groups keep their alphabetical order
 - [Added] Optional description per style group, shown below the group title in the style selection
+- [Fixed] Saving a record without the style field (e.g. from a front end editor) no longer removes styles and their CSS classes
+- [Fixed] CSS classes of styles that are not selected are no longer removed when saving
 - [Added] Preview color and preview image per style, shown as tiles in the style selection
 - [Added] The selected styles are shown in the list views (content elements, modules, pages, …)
 - [Added] Optional description per style, shown next to the name in the style selection
