@@ -1,0 +1,21 @@
+{
+    "name": "CSS Style Selector",
+    "screenshot": "docs/css-style-selector-preview.png",
+    "template": "pdir",
+    "de": {
+        "headline": "Stilkategorien und -gruppen",
+        "features": [
+            "Stilgruppen mit Einfach- oder Mehrfachauswahl",
+            "Gruppen per Drag & Drop sortieren",
+            "Gruppen auf Benutzergruppen beschränken"
+        ]
+    },
+    "en": {
+        "headline": "Style categories and groups",
+        "features": [
+            "Style groups with single or multiple choice",
+            "Sort groups by drag and drop",
+            "Limit groups to back end user groups"
+        ]
+    }
+}
