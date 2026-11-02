@@ -8,4 +8,9 @@ services:
         exclude:
             - ../src/ContaoManager/
             - ../src/Models/
+            - ../src/Widget/
             - ../src/CraffftCssStyleSelectorBundle.php
+
+    # Used by the back end widget, which is not a service
+    Craffft\CssStyleSelectorBundle\Repository\CssStyleRepository:
+        public: true

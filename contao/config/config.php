@@ -11,10 +11,15 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-use Craffft\CssStyleSelectorBundle\Models\CssStyleSelectorModel;
+use Craffft\CssStyleSelectorBundle\Models\CssStyleCategoryModel;
+use Craffft\CssStyleSelectorBundle\Models\CssStyleGroupModel;
+use Craffft\CssStyleSelectorBundle\Widget\CssStyleSelectorWidget;
 
 $GLOBALS['BE_MOD']['design']['cssStyleSelector'] = [
-    'tables' => ['tl_css_style_selector'],
+    'tables' => ['tl_css_style_category', 'tl_css_style_group'],
 ];
 
-$GLOBALS['TL_MODELS']['tl_css_style_selector'] = CssStyleSelectorModel::class;
+$GLOBALS['BE_FFL']['cssStyleSelector'] = CssStyleSelectorWidget::class;
+
+$GLOBALS['TL_MODELS']['tl_css_style_category'] = CssStyleCategoryModel::class;
+$GLOBALS['TL_MODELS']['tl_css_style_group'] = CssStyleGroupModel::class;

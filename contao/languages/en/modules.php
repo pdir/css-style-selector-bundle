@@ -14,4 +14,4 @@ declare(strict_types=1);
 /**
  * Back end modules
  */
-$GLOBALS['TL_LANG']['MOD']['cssStyleSelector'] = ['CSS styles', 'You can define CSS styles with predefined CSS classes here.'];
+$GLOBALS['TL_LANG']['MOD']['cssStyleSelector'] = ['CSS styles', 'You can define CSS styles with predefined CSS classes in categories and groups here.'];

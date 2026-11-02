@@ -14,15 +14,18 @@ declare(strict_types=1);
 use Contao\DataContainer;
 use Contao\DC_Table;
 
-$GLOBALS['TL_DCA']['tl_css_style_selector'] = [
+$GLOBALS['TL_DCA']['tl_css_style_group'] = [
     // Config
     'config' => [
         'dataContainer' => DC_Table::class,
+        'ptable' => 'tl_css_style_category',
+        'switchToEdit' => true,
         'enableVersioning' => true,
-        'markAsCopy' => 'styleDesignation',
+        'markAsCopy' => 'title',
         'sql' => [
             'keys' => [
                 'id' => 'primary',
+                'pid,sorting' => 'index',
             ],
         ],
     ],
@@ -30,29 +33,30 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = [
     // List
     'list' => [
         'sorting' => [
-            'mode' => DataContainer::MODE_SORTED,
-            'fields' => ['styleDesignation'],
-            'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'mode' => DataContainer::MODE_PARENT,
+            'fields' => ['sorting'],
+            'headerFields' => ['title', 'description'],
             'panelLayout' => 'filter;search,limit',
         ],
         'label' => [
-            'fields' => ['styleDesignation', 'cssClasses', 'articleEnabled', 'calendarEventEnabled', 'contentEnabled', 'formEnabled', 'formFieldEnabled', 'layoutEnabled', 'moduleEnabled', 'newsEnabled', 'pageEnabled'],
-            'showColumns' => true,
+            'fields' => ['title', 'description'],
+            'format' => '%s <span class="tl_gray">%s</span>',
         ],
-        'operations' => ['edit', 'copy', 'delete', 'show'],
+        'operations' => ['edit', 'copy', 'cut', 'delete', 'show'],
     ],
 
     // Palettes
     'palettes' => [
-        '__selector__' => ['limitContentElements', 'limitModules', 'limitFormFields'],
-        'default' => '{style_legend},styleDesignation;{css_legend},cssClasses;{permissions_legend},disableInArticle,disableInContent,disableInCalendarEvent,disableInForm,disableInFormField,disableInLayout,disableInModule,disableInNews,disableInPage;{restriction_legend},limitContentElements,limitModules,limitFormFields',
+        '__selector__' => ['inContent', 'inModule', 'inFormField', 'limitUserGroups'],
+        'default' => '{title_legend},title,description,multiple;{styles_legend},styles;{publish_legend},inLayout,inPage,inArticle,inModule,inNews,inCalendarEvent,inForm,inFormField,inContent;{permissions_legend:hide},limitUserGroups',
     ],
 
     // Subpalettes
     'subpalettes' => [
-        'limitContentElements' => 'contentElements',
-        'limitModules' => 'modules',
-        'limitFormFields' => 'formFields',
+        'inContent' => 'contentElements',
+        'inModule' => 'modules',
+        'inFormField' => 'formFields',
+        'limitUserGroups' => 'userGroups',
     ],
 
     // Fields
@@ -60,92 +64,80 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = [
         'id' => [
             'sql' => ['type' => 'integer', 'unsigned' => true, 'autoincrement' => true],
         ],
+        'pid' => [
+            'foreignKey' => 'tl_css_style_category.title',
+            'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy'],
+        ],
         'tstamp' => [
             'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
         ],
-        'styleDesignation' => [
+        'sorting' => [
+            'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
+        ],
+        'title' => [
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
         ],
-        'cssClasses' => [
+        'description' => [
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'eval' => ['maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
         ],
-        'disableInArticle' => [
+        'multiple' => [
             'exclude' => true,
             'filter' => true,
             'inputType' => 'checkbox',
+            'eval' => ['tl_class' => 'w50 m12'],
             'sql' => ['type' => 'boolean', 'default' => false],
         ],
-        'disableInCalendarEvent' => [
+        // One row per style: CSS class(es) and title. The row wizard is
+        // available since Contao 5.5, older versions use the key value wizard
+        // (both store the rows as "key" and "value").
+        'styles' => [
             'exclude' => true,
-            'filter' => true,
-            'inputType' => 'checkbox',
-            'sql' => ['type' => 'boolean', 'default' => false],
-        ],
-        'disableInContent' => [
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'checkbox',
-            'sql' => ['type' => 'boolean', 'default' => false],
-        ],
-        'disableInForm' => [
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'checkbox',
-            'sql' => ['type' => 'boolean', 'default' => false],
-        ],
-        'disableInFormField' => [
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'checkbox',
-            'sql' => ['type' => 'boolean', 'default' => false],
-        ],
-        'disableInLayout' => [
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'checkbox',
-            'sql' => ['type' => 'boolean', 'default' => false],
-        ],
-        'disableInModule' => [
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'checkbox',
-            'sql' => ['type' => 'boolean', 'default' => false],
-        ],
-        'disableInNews' => [
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'checkbox',
-            'sql' => ['type' => 'boolean', 'default' => false],
-        ],
-        'disableInPage' => [
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'checkbox',
-            'sql' => ['type' => 'boolean', 'default' => false],
-        ],
-        'limitContentElements' => [
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'checkbox',
-            'eval' => ['submitOnChange' => true, 'tl_class' => 'clr'],
-            'sql' => ['type' => 'boolean', 'default' => false],
-        ],
-        'contentElements' => [
-            'exclude' => true,
-            'inputType' => 'select',
-            'reference' => &$GLOBALS['TL_LANG']['CTE'],
-            'eval' => ['mandatory' => true, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
+            'inputType' => isset($GLOBALS['BE_FFL']['rowWizard']) ? 'rowWizard' : 'keyValueWizard',
+            'fields' => [
+                'key' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_css_style_group']['styleClass'],
+                    'inputType' => 'text',
+                    'eval' => ['decodeEntities' => true],
+                ],
+                'value' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_css_style_group']['styleTitle'],
+                    'inputType' => 'text',
+                ],
+            ],
+            'eval' => ['mandatory' => true, 'tl_class' => 'clr'],
             'sql' => 'blob NULL',
         ],
-        'limitModules' => [
+        'inLayout' => [
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['tl_class' => 'clr'],
+            'sql' => ['type' => 'boolean', 'default' => false],
+        ],
+        'inPage' => [
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['tl_class' => 'clr'],
+            'sql' => ['type' => 'boolean', 'default' => false],
+        ],
+        'inArticle' => [
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['tl_class' => 'clr'],
+            'sql' => ['type' => 'boolean', 'default' => false],
+        ],
+        'inModule' => [
             'exclude' => true,
             'filter' => true,
             'inputType' => 'checkbox',
@@ -154,12 +146,33 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = [
         ],
         'modules' => [
             'exclude' => true,
-            'inputType' => 'select',
+            'inputType' => 'checkbox',
             'reference' => &$GLOBALS['TL_LANG']['FMD'],
-            'eval' => ['mandatory' => true, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
+            'eval' => ['multiple' => true, 'tl_class' => 'clr'],
             'sql' => 'blob NULL',
         ],
-        'limitFormFields' => [
+        'inNews' => [
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['tl_class' => 'clr'],
+            'sql' => ['type' => 'boolean', 'default' => false],
+        ],
+        'inCalendarEvent' => [
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['tl_class' => 'clr'],
+            'sql' => ['type' => 'boolean', 'default' => false],
+        ],
+        'inForm' => [
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['tl_class' => 'clr'],
+            'sql' => ['type' => 'boolean', 'default' => false],
+        ],
+        'inFormField' => [
             'exclude' => true,
             'filter' => true,
             'inputType' => 'checkbox',
@@ -168,20 +181,39 @@ $GLOBALS['TL_DCA']['tl_css_style_selector'] = [
         ],
         'formFields' => [
             'exclude' => true,
-            'inputType' => 'select',
+            'inputType' => 'checkbox',
             'reference' => &$GLOBALS['TL_LANG']['FFL'],
-            'eval' => ['mandatory' => true, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
+            'eval' => ['multiple' => true, 'tl_class' => 'clr'],
             'sql' => 'blob NULL',
         ],
-        // Virtual fields for the list view columns
-        'articleEnabled' => [],
-        'calendarEventEnabled' => [],
-        'contentEnabled' => [],
-        'formEnabled' => [],
-        'formFieldEnabled' => [],
-        'layoutEnabled' => [],
-        'moduleEnabled' => [],
-        'newsEnabled' => [],
-        'pageEnabled' => [],
+        'inContent' => [
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['submitOnChange' => true, 'tl_class' => 'clr'],
+            'sql' => ['type' => 'boolean', 'default' => false],
+        ],
+        'contentElements' => [
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'reference' => &$GLOBALS['TL_LANG']['CTE'],
+            'eval' => ['multiple' => true, 'tl_class' => 'clr'],
+            'sql' => 'blob NULL',
+        ],
+        'limitUserGroups' => [
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['submitOnChange' => true, 'tl_class' => 'clr'],
+            'sql' => ['type' => 'boolean', 'default' => false],
+        ],
+        'userGroups' => [
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'foreignKey' => 'tl_user_group.name',
+            'eval' => ['mandatory' => true, 'multiple' => true, 'tl_class' => 'clr'],
+            'sql' => 'blob NULL',
+            'relation' => ['type' => 'hasMany', 'load' => 'lazy'],
+        ],
     ],
 ];
