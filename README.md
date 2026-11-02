@@ -7,13 +7,17 @@ articles, content elements, modules, forms, form fields, page layouts, pages,
 news and events. The classes of the selected styles are written into the CSS
 class field of the record.
 
-### CSS styles can be defined here
+### Define the styles in categories and groups
 
-![css selector navigation](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/master/docs/css-style-selector-nav.png)
+![Style groups of a category under Layout → CSS styles](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/master/docs/css-style-selector-groups.png)
 
-### The predefined styles can be selected here
+### Edit all styles of a group on one page
 
-![css selector navigation](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/master/docs/css-style-selector-preview.png)
+![Editing a style group with one row per style](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/master/docs/css-style-selector-group-edit.png)
+
+### Select the styles in the record
+
+![Style selection with one select menu per group](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/master/docs/css-style-selector-preview.png)
 
 
 Requirements
@@ -73,10 +77,11 @@ styles to the group.
 **For editors**
 
 The style selection is shown in its own "CSS style" section above the expert
-settings (the section of the CSS class field), with the select menus of the groups side by side. It is hidden if no
-styles are available for the record. The list views show the selected styles
-next to each record. A selected style is stored by its CSS classes, so the
-selection is kept when records are copied, exported or imported.
+settings (the section of the CSS class field), with the select menus of the
+groups side by side. It is hidden if no styles are available for the record.
+The list views show the selected styles next to each record. A selected style
+is stored by its CSS classes, so the selection is kept when records are
+copied, exported or imported.
 
 The CSS class field only shows the classes you entered yourself. The classes
 of the selected styles are added when the record is saved and are stored in
