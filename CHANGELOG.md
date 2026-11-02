@@ -11,7 +11,7 @@ Types of changes
 )
 
 
-## [2.0.0](https://github.com/pdir/css-style-selector-bundle/tree/2.0.0) – unreleased
+## [2.0.0](https://github.com/pdir/css-style-selector-bundle/tree/2.0.0) – 2026-11-02
 
 - [Added] Support for Contao 6
 - [Added] Limit styles to certain content element, module and form field types
