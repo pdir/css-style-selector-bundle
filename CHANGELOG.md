@@ -13,21 +13,21 @@ Types of changes
 
 ## [2.1.0](https://github.com/pdir/css-style-selector-bundle/tree/2.1.0) – unreleased
 
-- [Added] Style groups: each group is shown as its own section, with single selection (radio buttons) or multiple selection
+- [Added] Style categories and groups: each group is shown as a select menu (single or multiple selection), the select menus are shown side by side below a heading per category
+- [Added] Groups are sorted by drag and drop within their category and can be moved into another category; categories have a sorting value
+- [Added] Optional description per category and group
 - [Added] Limit style groups to certain back end user groups; styles selected by other users are kept
-- [Added] Manual sorting of styles via drag and drop
-- [Added] Manual sorting of style groups; existing groups keep their alphabetical order
-- [Added] Optional description per style group, shown below the group title in the style selection
-- [Fixed] Saving a record without the style field (e.g. from a front end editor) no longer removes styles and their CSS classes
-- [Fixed] CSS classes of styles that are not selected are no longer removed when saving
-- [Added] Preview color and preview image per style, shown as tiles in the style selection
 - [Added] The selected styles are shown in the list views (content elements, modules, pages, …)
-- [Added] Optional description per style, shown next to the name in the style selection
+- [Changed] The styles are rows of their group (CSS classes and title) instead of records of their own, so all styles of a group are edited on one page
+- [Changed] Areas and element types are set per group ("Publication") instead of per style; without selected element types, a group applies to all types
+- [Changed] The selection of a record stores the CSS classes of the selected styles instead of their IDs, so it survives copying, exporting and importing records
 - [Changed] The CSS class field only shows the manually entered classes; the classes of the selected styles are still saved in the field, so templates and the front end are unchanged
-- [Changed] Existing styles are moved into the group "Styles" with multiple selection by a migration, run `contao:migrate` after updating
-- [Changed] The style selection is shown in its own "CSS style" legend after the first legend instead of the collapsed expert legend
+- [Changed] Run `contao:migrate` after updating: existing styles become rows of their group (styles without a group go into the group "Styles" with multiple selection, groups without a category into the category "General"), the areas and element types of the styles are applied to their group and the selection of the records is converted; the table `tl_css_style_selector` can be dropped afterwards
+- [Changed] The style selection is shown in its own "CSS style" legend above the expert legend (the legend of the CSS class field) instead of inside the collapsed expert legend
 - [Changed] The style selection is hidden if no styles are available for the edited record
 - [Changed] Styles that are no longer available for a record (e.g. after changing the element type) are deselected on save
+- [Fixed] Saving a record without the style field (e.g. from a front end editor) no longer removes styles and their CSS classes
+- [Fixed] CSS classes of styles that are not selected are no longer removed when saving
 
 ## [2.0.0](https://github.com/pdir/css-style-selector-bundle/tree/2.0.0) – unreleased
 

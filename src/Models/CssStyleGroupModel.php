@@ -17,11 +17,25 @@ use Contao\Model;
 
 /**
  * @property int         $id
+ * @property int         $pid
  * @property int         $tstamp
  * @property int         $sorting
  * @property string      $title
  * @property string      $description
  * @property bool        $multiple
+ * @property string|null $styles
+ * @property bool        $inArticle
+ * @property bool        $inCalendarEvent
+ * @property bool        $inContent
+ * @property bool        $inForm
+ * @property bool        $inFormField
+ * @property bool        $inLayout
+ * @property bool        $inModule
+ * @property bool        $inNews
+ * @property bool        $inPage
+ * @property string|null $contentElements
+ * @property string|null $modules
+ * @property string|null $formFields
  * @property bool        $limitUserGroups
  * @property string|null $userGroups
  */

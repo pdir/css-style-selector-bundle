@@ -106,7 +106,7 @@ class CssStyleSelectorFieldListener implements ResetInterface
     /**
      * The selection before saving, for records whose style field was submitted.
      *
-     * @var array<string, array<int, array<int|string>>>
+     * @var array<string, array<int, list<string>>>
      */
     private array $previousSelection = [];
 
@@ -129,8 +129,8 @@ class CssStyleSelectorFieldListener implements ResetInterface
     }
 
     /**
-     * Adds the field in its own legend after the first legend of every palette
-     * that contains the CSS class field. This runs on load so that palettes
+     * Adds the field in its own legend before the legend of the CSS class field
+     * (usually the expert legend) of every palette that contains it. This runs on load so that palettes
      * registered late (e.g. by RockSolid Custom Elements or other extensions)
      * are covered as well.
      */
@@ -161,7 +161,14 @@ class CssStyleSelectorFieldListener implements ResetInterface
                 continue;
             }
 
-            if (preg_match('/^\{([^},:]+)/', $palette, $matches)) {
+            // Before the legend of the CSS class field (usually the expert legend), otherwise after the first legend
+            if (null !== ($legend = $this->findLegend($palette, self::TABLES[$table][1]))) {
+                $palette = PaletteManipulator::create()
+                    ->addLegend(self::LEGEND, $legend, PaletteManipulator::POSITION_BEFORE)
+                    ->addField(self::FIELD, self::LEGEND, PaletteManipulator::POSITION_APPEND)
+                    ->applyToString($palette)
+                ;
+            } elseif (preg_match('/^\{([^},:]+)/', $palette, $matches)) {
                 $palette = PaletteManipulator::create()
                     ->addLegend(self::LEGEND, $matches[1], PaletteManipulator::POSITION_AFTER)
                     ->addField(self::FIELD, self::LEGEND, PaletteManipulator::POSITION_APPEND)
@@ -176,7 +183,24 @@ class CssStyleSelectorFieldListener implements ResetInterface
     }
 
     /**
-     * Returns the styles the current user may select for the record.
+     * Returns the name of the legend that contains the given field.
+     */
+    private function findLegend(string $palette, string $field): string|null
+    {
+        foreach (explode(';', $palette) as $section) {
+            $fields = array_map(trim(...), explode(',', $section));
+
+            if (\in_array($field, $fields, true) && preg_match('/^\{([^},:]+)/', $fields[0], $matches)) {
+                return $matches[1];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the style groups the current user may use for the record (group
+     * ID => title); the widget shows one select menu per group.
      *
      * @return array<int, string>
      */
@@ -196,7 +220,10 @@ class CssStyleSelectorFieldListener implements ResetInterface
         $user = $this->security->getUser();
         $userGroups = $user instanceof BackendUser && !$user->isAdmin ? array_map(intval(...), (array) $user->groups) : null;
 
-        return $this->repository->findOptions($type, $elementType, $userGroups);
+        return array_map(
+            static fn (array $group): string => (string) $group['title'],
+            $this->repository->findAvailableGroups($type, $elementType, $userGroups),
+        );
     }
 
     public function reset(): void
@@ -216,7 +243,7 @@ class CssStyleSelectorFieldListener implements ResetInterface
             return $value;
         }
 
-        $managed = $this->repository->findCssClassesByIds(StringUtil::deserialize($dc->getCurrentRecord()[self::FIELD] ?? null, true));
+        $managed = CssStyleRepository::splitClasses(implode(' ', StringUtil::deserialize($dc->getCurrentRecord()[self::FIELD] ?? null, true)));
 
         if (!self::TABLES[$dc->table][2]) {
             return implode(' ', array_diff(CssStyleRepository::splitClasses((string) $value), $managed));
@@ -234,7 +261,7 @@ class CssStyleSelectorFieldListener implements ResetInterface
      */
     public function rememberSelection(mixed $value, DataContainer $dc): mixed
     {
-        $this->previousSelection[$dc->table][(int) $dc->id] ??= StringUtil::deserialize($dc->getCurrentRecord()[self::FIELD] ?? null, true);
+        $this->previousSelection[$dc->table][(int) $dc->id] ??= array_map(strval(...), StringUtil::deserialize($dc->getCurrentRecord()[self::FIELD] ?? null, true));
 
         return $value;
     }
@@ -256,7 +283,7 @@ class CssStyleSelectorFieldListener implements ResetInterface
             return;
         }
 
-        $previousIds = $this->previousSelection[$table][(int) $dc->id];
+        $previousSelection = $this->previousSelection[$table][(int) $dc->id];
         unset($this->previousSelection[$table][(int) $dc->id]);
 
         [$type, $classField, $serialized, $typeField] = self::TABLES[$table];
@@ -273,15 +300,15 @@ class CssStyleSelectorFieldListener implements ResetInterface
             return;
         }
 
-        $storedIds = StringUtil::deserialize($row[self::FIELD], true);
-        $availableIds = array_keys($this->repository->findAvailable($type, null !== $typeField ? ($row[$typeField] ?? null) : null));
-        $selectedIds = array_values(array_filter($storedIds, static fn ($id): bool => \in_array((int) $id, $availableIds, true)));
+        $stored = array_map(strval(...), StringUtil::deserialize($row[self::FIELD], true));
+        $groups = $this->repository->findAvailableGroups($type, null !== $typeField ? ($row[$typeField] ?? null) : null);
+        $selected = CssStyleRepository::filterSelection($groups, $stored);
 
         $cssId = $serialized ? StringUtil::deserialize($row[$classField], true) : null;
         $currentClasses = $serialized ? (string) ($cssId[1] ?? '') : (string) $row[$classField];
 
-        $classes = array_diff(CssStyleRepository::splitClasses($currentClasses), $this->repository->findCssClassesByIds([...$previousIds, ...$storedIds]));
-        $classes = array_merge($classes, $this->repository->findCssClassesByIds($selectedIds));
+        $classes = array_diff(CssStyleRepository::splitClasses($currentClasses), CssStyleRepository::splitClasses(implode(' ', [...$previousSelection, ...$stored])));
+        $classes = array_merge($classes, CssStyleRepository::splitClasses(implode(' ', $selected)));
         $newClasses = implode(' ', array_unique($classes));
 
         $data = [];
@@ -290,8 +317,8 @@ class CssStyleSelectorFieldListener implements ResetInterface
             $data[$this->connection->quoteIdentifier($classField)] = $serialized ? serialize([$cssId[0] ?? '', $newClasses]) : $newClasses;
         }
 
-        if ($selectedIds !== $storedIds) {
-            $data[$this->connection->quoteIdentifier(self::FIELD)] = $selectedIds ? serialize($selectedIds) : null;
+        if ($selected !== $stored) {
+            $data[$this->connection->quoteIdentifier(self::FIELD)] = $selected ? serialize($selected) : null;
         }
 
         if (!$data) {
@@ -349,7 +376,7 @@ class CssStyleSelectorFieldListener implements ResetInterface
                 $label = $callback($row, ...$args);
             }
 
-            $names = $this->repository->findDesignationsByIds(StringUtil::deserialize($row[self::FIELD] ?? null, true));
+            $names = $this->repository->findTitles(array_map(strval(...), StringUtil::deserialize($row[self::FIELD] ?? null, true)));
 
             if (!$names) {
                 return $label;
