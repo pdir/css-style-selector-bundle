@@ -9,15 +9,15 @@ class field of the record.
 
 ### Define the styles in categories and groups
 
-![Style groups of a category under Layout → CSS styles](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/master/docs/css-style-selector-groups.png)
+![Style groups of a category under Layout → CSS styles](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/main/docs/css-style-selector-groups.png)
 
 ### Edit all styles of a group on one page
 
-![Editing a style group with one row per style](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/master/docs/css-style-selector-group-edit.png)
+![Editing a style group with one row per style](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/main/docs/css-style-selector-group-edit.png)
 
 ### Select the styles in the record
 
-![Style selection with one select menu per group](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/master/docs/css-style-selector-preview.png)
+![Style selection with one select menu per group](https://raw.githubusercontent.com/pdir/css-style-selector-bundle/main/docs/css-style-selector-preview.png)
 
 
 Requirements

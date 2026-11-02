@@ -11,7 +11,7 @@ Types of changes
 )
 
 
-## [2.1.0](https://github.com/pdir/css-style-selector-bundle/tree/2.1.0) – unreleased
+## [2.1.0](https://github.com/pdir/css-style-selector-bundle/tree/2.1.0) – 2026-11-03
 
 - [Added] Style categories and groups: each group is shown as a select menu (single or multiple selection), the select menus are shown side by side below a heading per category
 - [Added] Groups are sorted by drag and drop within their category and can be moved into another category; categories have a sorting value
@@ -29,7 +29,7 @@ Types of changes
 - [Fixed] Saving a record without the style field (e.g. from a front end editor) no longer removes styles and their CSS classes
 - [Fixed] CSS classes of styles that are not selected are no longer removed when saving
 
-## [2.0.0](https://github.com/pdir/css-style-selector-bundle/tree/2.0.0) – unreleased
+## [2.0.0](https://github.com/pdir/css-style-selector-bundle/tree/2.0.0) – 2026-11-02
 
 - [Added] Support for Contao 6
 - [Added] Limit styles to certain content element, module and form field types
