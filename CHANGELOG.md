@@ -11,7 +11,7 @@ Types of changes
 )
 
 
-## [2.1.0](https://github.com/pdir/css-style-selector-bundle/tree/2.1.0) – 2026-11-03
+## [2.1.0](https://github.com/pdir/css-style-selector-bundle/tree/2.1.0) – 2026-11-09
 
 - [Added] Style categories and groups: each group is shown as a select menu (single or multiple selection), the select menus are shown side by side below a heading per category
 - [Added] Groups are sorted by drag and drop within their category and can be moved into another category; categories have a sorting value
